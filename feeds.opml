@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<opml version="1.0">
+  <head>
+    <title>TRDB feeds (Inoreader import ready)</title>
+  </head>
+  <body>
+
+    <!-- ===================================================================
+         TRDB_시황 : 기존 8개 (Inoreader 원본)
+         · carbaid 오타 → carbide 로 수정
+         · Sumitomo 꼬리 AND "" 제거 후 단독 분리
+         · 한글 쿼리 2개 로케일 en-US → ko/KR 로 교정
+         로케일·when: 파라미터는 trdb.py 의 normalize_google_feed() 가
+         재작성하므로, Inoreader 에서 다시 내려받아도 코드가 다시 고칩니다.
+         =================================================================== -->
+    <outline text="TRDB_시황" title="TRDB_시황">
+
+      <outline type="rss" text="tungsten" title="tungsten"
+        xmlUrl="https://news.google.com/rss/search?q=tungsten&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"/>
+      <outline type="rss" text="tungsten recycling" title="tungsten recycling"
+        xmlUrl="https://news.google.com/rss/search?q=tungsten%20recycling&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"/>
+      <outline type="rss" text="tungsten apt" title="tungsten apt"
+        xmlUrl="https://news.google.com/rss/search?q=tungsten%20apt&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"/>
+      <!-- 수정: carbaid → carbide -->
+      <outline type="rss" text="tungsten carbide" title="tungsten carbide"
+        xmlUrl="https://news.google.com/rss/search?q=tungsten%20carbide&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"/>
+      <outline type="rss" text="tungsten AND Mitsubishi" title="tungsten AND Mitsubishi"
+        xmlUrl="https://news.google.com/rss/search?q=%22tungsten%22%20AND%20%22Mitsubishi%22&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"/>
+      <!-- 수정: 깨진 복합쿼리를 Sumitomo 단독으로 분리 -->
+      <outline type="rss" text="tungsten AND Sumitomo" title="tungsten AND Sumitomo"
+        xmlUrl="https://news.google.com/rss/search?q=%22tungsten%22%20AND%20%22Sumitomo%22&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"/>
+      <outline type="rss" text="tungsten AND xiamen" title="tungsten AND xiamen"
+        xmlUrl="https://news.google.com/rss/search?q=%22tungsten%22%20AND%20%22xiamen%22&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"/>
+      <!-- 수정: 한글 쿼리 로케일 -->
+      <outline type="rss" text="텅스텐" title="텅스텐"
+        xmlUrl="https://news.google.com/rss/search?q=%ED%85%85%EC%8A%A4%ED%85%90&amp;hl=ko&amp;gl=KR&amp;ceid=KR:ko"/>
+      <outline type="rss" text="텅스텐 재활용" title="텅스텐 재활용"
+        xmlUrl="https://news.google.com/rss/search?q=%ED%85%85%EC%8A%A4%ED%85%90%20%EC%9E%AC%ED%99%9C%EC%9A%A9&amp;hl=ko&amp;gl=KR&amp;ceid=KR:ko"/>
+
+    </outline>
+
+    <!-- ===================================================================
+         TRDB_주제 : 영어 주제 쿼리 (추가 권장분)
+         =================================================================== -->
+    <outline text="TRDB_주제" title="TRDB_주제">
+
+      <outline type="rss" text="ammonium paratungstate" title="ammonium paratungstate"
+        xmlUrl="https://news.google.com/rss/search?q=ammonium%20paratungstate&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"/>
+      <outline type="rss" text="tungsten carbide recycling" title="tungsten carbide recycling"
+        xmlUrl="https://news.google.com/rss/search?q=%22tungsten%20carbide%22%20recycling&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"/>
+      <outline type="rss" text="cemented carbide scrap" title="cemented carbide scrap"
+        xmlUrl="https://news.google.com/rss/search?q=%22cemented%20carbide%22%20scrap&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"/>
+      <outline type="rss" text="hard metal recycling" title="hard metal recycling"
+        xmlUrl="https://news.google.com/rss/search?q=%22hard%20metal%22%20recycling%20tungsten&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"/>
+      <outline type="rss" text="ferrotungsten" title="ferrotungsten"
+        xmlUrl="https://news.google.com/rss/search?q=ferrotungsten&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"/>
+      <outline type="rss" text="tungsten export control" title="tungsten export control"
+        xmlUrl="https://news.google.com/rss/search?q=tungsten%20export%20control&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"/>
+      <outline type="rss" text="tungsten critical minerals stockpile" title="tungsten critical minerals stockpile"
+        xmlUrl="https://news.google.com/rss/search?q=tungsten%20critical%20minerals%20stockpile&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"/>
+      <outline type="rss" text="scheelite" title="scheelite"
+        xmlUrl="https://news.google.com/rss/search?q=scheelite%20OR%20wolframite&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"/>
+
+    </outline>
+
+    <!-- ===================================================================
+         TRDB_기업 : 경쟁사·거래처 (초안 — 불필요한 건 지우세요)
+         =================================================================== -->
+    <outline text="TRDB_기업" title="TRDB_기업">
+
+      <outline type="rss" text="Global Tungsten Powders" title="Global Tungsten Powders"
+        xmlUrl="https://news.google.com/rss/search?q=%22Global%20Tungsten%22%20OR%20%22Plansee%22&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"/>
+      <outline type="rss" text="H.C. Starck tungsten" title="H.C. Starck tungsten"
+        xmlUrl="https://news.google.com/rss/search?q=%22H.C.%20Starck%22&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"/>
+      <outline type="rss" text="Kennametal" title="Kennametal"
+        xmlUrl="https://news.google.com/rss/search?q=Kennametal&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"/>
+      <outline type="rss" text="Ceratizit" title="Ceratizit"
+        xmlUrl="https://news.google.com/rss/search?q=Ceratizit&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"/>
+      <outline type="rss" text="Sandvik tungsten" title="Sandvik tungsten"
+        xmlUrl="https://news.google.com/rss/search?q=Sandvik%20tungsten%20OR%20Hyperion&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"/>
+      <outline type="rss" text="Almonty Sangdong" title="Almonty Sangdong"
+        xmlUrl="https://news.google.com/rss/search?q=Almonty%20OR%20Sangdong&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"/>
+      <outline type="rss" text="Masan High-Tech Materials Nui Phao" title="Masan High-Tech Materials Nui Phao"
+        xmlUrl="https://news.google.com/rss/search?q=%22Masan%20High-Tech%22%20OR%20%22Nui%20Phao%22&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"/>
+      <outline type="rss" text="China Molybdenum tungsten" title="China Molybdenum tungsten"
+        xmlUrl="https://news.google.com/rss/search?q=%22China%20Molybdenum%22%20OR%20CMOC%20tungsten&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"/>
+      <outline type="rss" text="Chongyi Zhangyuan tungsten" title="Chongyi Zhangyuan tungsten"
+        xmlUrl="https://news.google.com/rss/search?q=%22Chongyi%20Zhangyuan%22%20OR%20%22Xiamen%20Golden%20Egret%22&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"/>
+      <outline type="rss" text="Nippon Tungsten JX" title="Nippon Tungsten JX"
+        xmlUrl="https://news.google.com/rss/search?q=%22Nippon%20Tungsten%22%20OR%20%22JX%20Advanced%20Metals%22&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"/>
+
+    </outline>
+
+    <!-- ===================================================================
+         TRDB_국내 : 한국어 (전부 ko/KR 로케일)
+         =================================================================== -->
+    <outline text="TRDB_국내" title="TRDB_국내">
+
+      <outline type="rss" text="초경합금" title="초경합금"
+        xmlUrl="https://news.google.com/rss/search?q=%EC%B4%88%EA%B2%BD%ED%95%A9%EA%B8%88&amp;hl=ko&amp;gl=KR&amp;ceid=KR:ko"/>
+      <outline type="rss" text="폐초경" title="폐초경"
+        xmlUrl="https://news.google.com/rss/search?q=%ED%8F%90%EC%B4%88%EA%B2%BD&amp;hl=ko&amp;gl=KR&amp;ceid=KR:ko"/>
+      <outline type="rss" text="초경 스크랩" title="초경 스크랩"
+        xmlUrl="https://news.google.com/rss/search?q=%EC%B4%88%EA%B2%BD%20%EC%8A%A4%ED%81%AC%EB%9E%A9&amp;hl=ko&amp;gl=KR&amp;ceid=KR:ko"/>
+      <outline type="rss" text="절삭공구" title="절삭공구"
+        xmlUrl="https://news.google.com/rss/search?q=%EC%A0%88%EC%82%AD%EA%B3%B5%EA%B5%AC&amp;hl=ko&amp;gl=KR&amp;ceid=KR:ko"/>
+      <outline type="rss" text="텅스텐 수출통제" title="텅스텐 수출통제"
+        xmlUrl="https://news.google.com/rss/search?q=%ED%85%85%EC%8A%A4%ED%85%90%20%EC%88%98%EC%B6%9C%ED%86%B5%EC%A0%9C&amp;hl=ko&amp;gl=KR&amp;ceid=KR:ko"/>
+      <outline type="rss" text="핵심광물" title="핵심광물"
+        xmlUrl="https://news.google.com/rss/search?q=%ED%95%B5%EC%8B%AC%EA%B4%91%EB%AC%BC&amp;hl=ko&amp;gl=KR&amp;ceid=KR:ko"/>
+      <outline type="rss" text="상동광산 알몬티" title="상동광산 알몬티"
+        xmlUrl="https://news.google.com/rss/search?q=%EC%83%81%EB%8F%99%EA%B4%91%EC%82%B0%20OR%20%EC%95%8C%EB%AA%AC%ED%8B%B0&amp;hl=ko&amp;gl=KR&amp;ceid=KR:ko"/>
+      <outline type="rss" text="대구텍 한국야금" title="대구텍 한국야금"
+        xmlUrl="https://news.google.com/rss/search?q=%EB%8C%80%EA%B5%AC%ED%85%8D%20OR%20%ED%95%9C%EA%B5%AD%EC%95%BC%EA%B8%88&amp;hl=ko&amp;gl=KR&amp;ceid=KR:ko"/>
+
+    </outline>
+
+    <!-- ===================================================================
+         TRDB_전문지 : 구글뉴스가 아닌 매체 피드
+         folder 이름이 "_전문지" 로 끝나면 trdb.py 가 화이트리스트
+         면제(is_special=True) 로 처리합니다.
+         =================================================================== -->
+    <outline text="TRDB_전문지" title="TRDB_전문지">
+
+      <outline type="rss" text="SMM Metal" title="SMM Metal"
+        xmlUrl="https://rss.metal.com/news/the_latest.xml"/>
+      <outline type="rss" text="MINING.COM" title="MINING.COM"
+        xmlUrl="https://www.mining.com/feed/"/>
+      <outline type="rss" text="철강금속신문" title="철강금속신문"
+        xmlUrl="http://www.snmnews.com/rss/allArticle.xml"/>
+      <outline type="rss" text="더구루" title="더구루"
+        xmlUrl="https://www.theguru.co.kr/data/rss/news.xml"/>
+
+    </outline>
+
+  </body>
+</opml>
