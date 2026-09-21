@@ -1,0 +1,59 @@
+name: Tungsten Recycling Daily Brief
+
+on:
+  schedule:
+    # UTC 00:44 = KST 09:44
+    # BRDB(UTC 00:24)와 20분 띄웠다. 동시에 돌면 Jina·Gemini
+    # 레이트리밋에서 서로 간섭한다.
+    - cron: '44 0 * * *'
+  workflow_dispatch:        # 수동 실행 버튼
+
+# 같은 워크플로가 겹쳐 돌면 docs/ 커밋이 충돌한다.
+concurrency:
+  group: trdb-daily
+  cancel-in-progress: false
+
+jobs:
+  send-brief:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Install Chromium
+        run: python -m playwright install --with-deps chromium
+
+      - name: Run TRDB
+        env:
+          GEMINI_API_KEY:     ${{ secrets.GEMINI_API_KEY }}
+          GMAIL_USER:         ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          TO_EMAIL:           ${{ secrets.TO_EMAIL }}
+          BCC_EMAIL:          ${{ secrets.BCC_EMAIL }}
+        run: python trdb.py
+
+      - name: Commit results
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/
+          git diff --staged --quiet && echo "변경 없음" && exit 0
+          git commit -m "brief $(date +%F)"
+          # 원격이 앞서 있으면 rebase 후 push. 최대 3회 재시도.
+          for i in 1 2 3; do
+            git pull --rebase --autostash && git push && exit 0
+            echo "push 재시도 $i"
+            sleep 5
+          done
+          exit 1
