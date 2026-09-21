@@ -1,0 +1,77 @@
+<!DOCTYPE html><html lang="ko"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>TRDB 아카이브</title>
+<style>
+  body { margin:0;background:#f8fafc;font-family:'Apple SD Gothic Neo',
+         'Malgun Gothic',Arial,sans-serif;color:#0f2744; }
+  .wrap { max-width:520px;margin:0 auto;padding:10px 16px 60px; }
+  .card { background:#fff;border:1px solid #e2e8f0;border-radius:10px;
+          padding:18px 20px 22px;margin-top:18px; }
+  .nav { display:flex;align-items:center;justify-content:space-between;margin-bottom:14px; }
+  .nav button { width:32px;height:32px;border:1px solid #e2e8f0;background:#fff;
+                border-radius:8px;font-size:15px;color:#334155;cursor:pointer;line-height:1; }
+  .nav button:disabled { color:#e2e8f0;cursor:default; }
+  .nav b { font-size:15px; }
+  .wd, #cal { display:grid;grid-template-columns:repeat(7,1fr);gap:5px; }
+  .wd span { text-align:center;font-size:11px;color:#94a3b8;font-weight:700;padding-bottom:6px; }
+  #cal a, #cal span { display:flex;align-items:center;justify-content:center;
+                      height:38px;border-radius:8px;font-size:14px; }
+  #cal a.on { background:#b45309;color:#fff;font-weight:700;text-decoration:none; }
+  #cal a.on:hover { background:#92400e; }
+  #cal span.off { color:#cbd5e1; }
+  details summary { cursor:pointer;font-size:13px;color:#2563eb;font-weight:600;padding:6px 0; }
+</style></head><body>
+<div style="background:#1c1917;color:#fff;padding:24px 0;">
+  <div style="max-width:520px;margin:0 auto;padding:0 16px;">
+    <div style="font-size:18px;font-weight:700;">TRDB 아카이브</div>
+    <div style="color:#a8a29e;font-size:12px;margin-top:5px;">총 1건</div>
+  </div></div>
+<div class="wrap">
+  <a href="../index.html" style="display:inline-block;margin:18px 0 2px;
+     font-size:13px;color:#b45309;text-decoration:none;">← 오늘 브리핑</a>
+  
+  <div class="card">
+    <div class="nav">
+      <button id="prev" onclick="move(-1)">&lsaquo;</button>
+      <b id="label"></b>
+      <button id="next" onclick="move(1)">&rsaquo;</button>
+    </div>
+    <div class="wd"><span>일</span><span>월</span><span>화</span><span>수</span>
+      <span>목</span><span>금</span><span>토</span></div>
+    <div id="cal"></div>
+  </div>
+  <details style="margin-top:16px;">
+    <summary>전체 목록 (1건)</summary>
+    <div style="margin-top:8px;"><a href="2026-09-22.html" style="display:inline-block;padding:6px 10px;margin:0 5px 5px 0;background:#fff;border:1px solid #e2e8f0;border-radius:6px;font-size:12px;color:#0f2744;text-decoration:none;">2026-09-22</a></div>
+  </details>
+  <script>
+const DATES = ["2026-09-22"];
+const SET   = new Set(DATES);
+let cur;
+const pad = n => String(n).padStart(2, '0');
+const ym  = d => d.getFullYear() + '-' + pad(d.getMonth() + 1);
+function render() {
+  const y = cur.getFullYear(), m = cur.getMonth();
+  const first = new Date(y, m, 1).getDay();
+  const days  = new Date(y, m + 1, 0).getDate();
+  let cells = '';
+  for (let i = 0; i < first; i++) cells += '<span></span>';
+  for (let d = 1; d <= days; d++) {
+    const key = y + '-' + pad(m + 1) + '-' + pad(d);
+    cells += SET.has(key)
+      ? '<a class="on" href="' + key + '.html">' + d + '</a>'
+      : '<span class="off">' + d + '</span>';
+  }
+  document.getElementById('cal').innerHTML = cells;
+  document.getElementById('label').textContent = y + '년 ' + (m + 1) + '월';
+  document.getElementById('prev').disabled = ym(cur) <= DATES[DATES.length-1].slice(0,7);
+  document.getElementById('next').disabled = ym(cur) >= DATES[0].slice(0,7);
+}
+function move(n) { cur = new Date(cur.getFullYear(), cur.getMonth() + n, 1); render(); }
+(function () {
+  const latest = DATES[0] || new Date().toISOString().slice(0, 10);
+  cur = new Date(+latest.slice(0,4), +latest.slice(5,7) - 1, 1);
+  render();
+})();
+</script>
+</div></body></html>
