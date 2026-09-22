@@ -2,17 +2,17 @@
  {
   "date": "2026-09-22",
   "usd_cny": 6.6954,
-  "apt_cn": 76417.64,
+  "apt_cn": 75816.43,
   "apt_rott": null,
-  "wc_new": 111.99,
-  "wc_regen": 102.77,
+  "wc_new": 110.76,
+  "wc_regen": 102.19,
   "scrap_cnc": null,
   "scrap_ball": null,
-  "few": 83664.14,
-  "conc65": 52899.45,
-  "co_sulph": 8234.66,
+  "few": 83727.71,
+  "conc65": 52807.79,
+  "co_sulph": 8240.92,
   "payable": null,
-  "regen": 91.77,
+  "regen": 92.26,
   "cn_west": null
  }
 ]
