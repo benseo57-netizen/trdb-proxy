@@ -382,5 +382,21 @@
   "payable": null,
   "regen": 90.27,
   "cn_west": null
+ },
+ {
+  "date": "2026-10-16",
+  "usd_cny": 6.691,
+  "apt_cn": 59362.02,
+  "apt_rott": null,
+  "wc_new": 92.34,
+  "wc_regen": 83.11,
+  "scrap_cnc": null,
+  "scrap_ball": null,
+  "few": 69255.69,
+  "conc65": 38519.35,
+  "co_sulph": 7057.48,
+  "payable": null,
+  "regen": 90.0,
+  "cn_west": null
  }
 ]
