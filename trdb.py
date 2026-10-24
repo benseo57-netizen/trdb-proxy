@@ -59,6 +59,9 @@ REPO_NAME   = "trdb-proxy"
 WEB_BASE    = f"https://{GITHUB_USER}.github.io/{REPO_NAME}"
 
 PRICE_JSON = "docs/data/prices.json"
+MANUAL_JSON = "manual_prices.json"   # 자동 수집이 안 되는 시세 — 주 1회 손으로 갱신
+MANUAL_STALE_DAYS = 10               # 이보다 오래되면 노란 배지
+EU_CACHE = "docs/data/eu_scrap.json" # 뉴스에서 자동으로 찾은 유럽 인서트 시세 (커밋됨)
 SEEN_JSON  = "docs/data/seen.json"
 OPML_FILE  = "feeds.opml"
 
@@ -116,7 +119,13 @@ SPOT_TARGETS = [
      "pid": "202307200004", "unit": "USD/kg",    "w": 0.80,   "lo": 2,     "hi": 1_000,   "grp": "원료"},
     {"key": "scrap_ins_eu","name": "폐 인서트 (유럽)", "name_en": "Tungsten Carbide Inserts Scrap, in-whs Europe",
      "pid": "202602030003", "unit": "USD/kg",    "w": 0.80,   "lo": 2,     "hi": 1_000,   "grp": "원료",
-     "novat": True, "eur": True},   # EUR/kg 주간 고시(목) → USD 환산
+     "novat": True, "eur": True, "manual": True,
+     # 신규 품목이라 옛 사이트(www-old)에 없다. 대체 순서:
+     #   ① 새 사이트 /en/prices/ 페이지 (로그인 없이 현재가가 보이는 경우가 있음)
+     #   ② SMM 무료 뉴스 'Tungsten Express' 본문에서 유럽 인서트 가격 추출
+     #   ③ ②에서 마지막으로 찾은 값 (docs/data/eu_scrap.json)
+     #   ④ manual_prices.json 수동값          — ③·④ 중 날짜가 최신인 것
+     "url": "https://www.metal.com/en/prices/202602030003"},   # EUR/kg 주간 고시(목)
     {"key": "scrap_ball", "name": "폐 볼치",           "name_en": "Waste Ball Teeth",
      "pid": "202511190007", "unit": "USD/kg",    "w": 0.845,  "lo": 2,     "hi": 1_000,   "grp": "원료"},
     {"key": "conc65",     "name": "흑중석 정광 65%",   "name_en": "Wolframite Concentrate 65%",
@@ -707,7 +716,7 @@ _NUM = r"[\d]{1,3}(?:,\d{3})*(?:\.\d+)?"
 _USD_PAIR_RE = re.compile(
     rf"({_NUM})(?:\s*[-–~]\s*({_NUM}))?\s*USD\s*/\s*(?:{_UNIT_ALT})", re.IGNORECASE)
 _EUR_PAIR_RE = re.compile(
-    rf"({_NUM})(?:\s*[-–~]\s*({_NUM}))?\s*EUR\s*/\s*(?:{_UNIT_ALT})", re.IGNORECASE)
+    rf"(?<![\w\-.])({_NUM})(?:\s*[-–~]\s*({_NUM}))?\s*EUR\s*/\s*(?:{_UNIT_ALT})", re.IGNORECASE)
 _CNY_PAIR_RE = re.compile(
     rf"({_NUM})(?:\s*[-–~]\s*({_NUM}))?\s*yuan\s*/\s*(?:{_UNIT_ALT})", re.IGNORECASE)
 
@@ -938,6 +947,99 @@ BROWSER_UA    = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
                  "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
 
 
+def _eur_row(t: dict, eur: float, date_str: str, how: str, src: str) -> dict:
+    """EUR/kg 값 하나로 시세 행을 만든다 (뉴스·캐시·수동 공용)."""
+    dt = datetime.strptime(date_str, "%Y-%m-%d")
+    lag = (now_kst().date() - dt.date()).days
+    usd = eur * get_eur_usd_rate()
+    return {"key": t["key"], "name": t["name"], "name_en": t["name_en"],
+            "unit": t["unit"], "grp": t["grp"], "w": t.get("w"),
+            "url": t.get("url"), "date": dt.strftime("%b %d, %Y"),
+            "usd_excl": usd, "cny_incl": None, "cny_excl": None,
+            "usd_kg_w": usd / t["w"] if t.get("w") else None,
+            "change_pct": "N/A", "per_wo3": False, "eur_orig": eur,
+            "basis": f"{dt.month:02d}.{dt.day:02d} {how}", "delayed": lag >= MANUAL_STALE_DAYS,
+            "manual": how != "고시", "manual_src": src, "status": "OK"}
+
+
+def _load_json(path: str) -> dict:
+    try:
+        with open(path, encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
+def _manual_price(t: dict) -> dict | None:
+    """캐시(뉴스 자동)와 수동값 중 날짜가 최신인 쪽."""
+    cands = []
+    c = _load_json(EU_CACHE).get(t["key"])
+    if c and c.get("eur"):
+        cands.append((c["date"], c["eur"], "뉴스", c.get("source", "")))
+    mn = _load_json(MANUAL_JSON).get(t["key"])
+    if mn and mn.get("eur"):
+        cands.append((mn["date"], mn["eur"], "수동", mn.get("source", "")))
+    if not cands:
+        return None
+    d, eur, how, src = max(cands)
+    return _eur_row(t, eur, d, how, src)
+
+
+# 'European scrap carbide blades at €97.5/kg', 'inserts in Europe … €65-85/kg' 등
+_EU_NEWS_RE = [
+    re.compile(r"Europe\w*[^.€]{0,120}?(?:insert|blade)s?[^.€]{0,80}?€\s*([\d.]+)"
+               r"(?:\s*[-–~]\s*€?\s*([\d.]+))?\s*/\s*kg", re.I),
+    re.compile(r"(?:insert|blade)s?[^.€]{0,80}?Europe\w*[^.€]{0,80}?€\s*([\d.]+)"
+               r"(?:\s*[-–~]\s*€?\s*([\d.]+))?\s*/\s*kg", re.I),
+]
+
+
+async def _scrape_eu_news(page, t: dict) -> dict | None:
+    """SMM RSS 에서 텅스텐 기사를 골라 본문에서 유럽 인서트 가격을 찾는다.
+    찾으면 EU_CACHE 에 저장해 다음 실행(기사가 RSS 에서 밀려난 뒤)에도 쓴다."""
+    try:
+        r = requests.get(SMM_RSS_URL, timeout=15, headers={"User-Agent": BROWSER_UA})
+        root = ET.fromstring(r.content)
+    except Exception as e:
+        print(f"      뉴스 RSS 실패({e})", end=" ")
+        return None
+    cands = []
+    for item in root.findall(".//item"):
+        title = (item.findtext("title") or "")
+        desc  = (item.findtext("description") or "")[:600]
+        blob  = (title + " " + desc).lower()
+        if "tungsten" in blob and ("europe" in blob or "scrap" in blob):
+            try:
+                pub = datetime.strptime((item.findtext("pubDate") or "").strip(),
+                                        "%H:%M:%S %b %d, %Y")
+            except Exception:
+                pub = now_kst()
+            cands.append((pub, (item.findtext("link") or "").strip(), title))
+    for pub, link, title in sorted(cands, reverse=True)[:4]:
+        try:
+            await page.goto(link, wait_until="domcontentloaded", timeout=30000)
+            await page.wait_for_timeout(2000)
+            text = await page.inner_text("body")
+        except Exception:
+            continue
+        for rx in _EU_NEWS_RE:
+            m = rx.search(text)
+            if m:
+                lo = float(m.group(1)); hi = float(m.group(2)) if m.group(2) else lo
+                eur = (lo + hi) / 2
+                if not (20 < eur < 500):
+                    continue
+                d = pub.strftime("%Y-%m-%d")
+                src = f"SMM 뉴스: {title[:80]}"
+                cache = _load_json(EU_CACHE)
+                cache[t["key"]] = {"eur": eur, "date": d, "source": src, "url": link}
+                os.makedirs(os.path.dirname(EU_CACHE), exist_ok=True)
+                with open(EU_CACHE, "w", encoding="utf-8") as f:
+                    json.dump(cache, f, ensure_ascii=False, indent=1)
+                return _eur_row(t, eur, d, "뉴스", src)
+    return None
+
+
 async def scrape_prices() -> dict:
     print("\n[SMM 텅스텐 시세 수집]")
     spot, extras = [], {}
@@ -957,6 +1059,17 @@ async def scrape_prices() -> dict:
                 r = {"key": t["key"], "name": t["name"], "name_en": t["name_en"],
                      "unit": t["unit"], "grp": t["grp"], "w": t.get("w"),
                      "status": "ERROR: 타임아웃(75초)"}
+            if r["status"] != "OK" and t.get("manual"):
+                print(f"! {r['status']} → 뉴스 탐색", end=" ", flush=True)
+                try:
+                    mr = await asyncio.wait_for(_scrape_eu_news(page, t), timeout=90)
+                except asyncio.TimeoutError:
+                    mr = None
+                if not mr:
+                    mr = _manual_price(t)
+                if mr:
+                    print(f"→ €{mr['eur_orig']:,.2f} ({mr['basis']})", end=" ", flush=True)
+                    r = mr
             spot.append(r)
             print("OK" if r["status"] == "OK" else f"! {r['status']}", flush=True)
             await asyncio.sleep(2)
@@ -1042,7 +1155,8 @@ def compute_target_cost(m: dict) -> dict | None:
                 desc = f"{need:.2f}kg × ${px:,.2f}"
             src = "SMM " + r["name"]
             if r.get("eur_orig"):
-                src += f" (€{r['eur_orig']:,.2f}/kg)"
+                src += f" (€{r['eur_orig']:,.2f}/kg"
+                src += f", {r['basis']})" if r.get("manual") else ")"
         cap = sale - feed - sale * mg
         return {"ok": True, "feed_cost": feed, "desc": desc, "src": src, "cap": cap}
 
