@@ -120,12 +120,14 @@ SPOT_TARGETS = [
     {"key": "scrap_ins_eu","name": "폐 인서트 (유럽)", "name_en": "Tungsten Carbide Inserts Scrap, in-whs Europe",
      "pid": "202602030003", "unit": "USD/kg",    "w": 0.80,   "lo": 2,     "hi": 1_000,   "grp": "원료",
      "novat": True, "eur": True, "manual": True,
-     # 신규 품목이라 옛 사이트(www-old)에 없다. 대체 순서:
-     #   ① 새 사이트 /en/prices/ 페이지 (로그인 없이 현재가가 보이는 경우가 있음)
-     #   ② SMM 무료 뉴스 'Tungsten Express' 본문에서 유럽 인서트 가격 추출
-     #   ③ ②에서 마지막으로 찾은 값 (docs/data/eu_scrap.json)
-     #   ④ manual_prices.json 수동값          — ③·④ 중 날짜가 최신인 것
-     "url": "https://www.metal.com/en/prices/202602030003"},   # EUR/kg 주간 고시(목)
+     # 신규 품목이라 옛 사이트(www-old)에 없고 새 사이트는 로그인/500 오류.
+     # 고시 페이지는 건너뛰고 아래 순서로 구한다.
+     #   ① SMM 무료 주간 뉴스 'Tungsten Express' 본문에서 유럽 폐 카바이드 가격 추출
+     #      (기사 찾기: SMM RSS + 구글뉴스 검색)
+     #   ② ①에서 마지막으로 찾은 값 (docs/data/eu_scrap.json)
+     #   ③ manual_prices.json 수동값          — ②·③ 중 날짜가 최신인 것
+     "skip_page": True,
+     "url": "https://www.metal.com/tungsten/202602030003"},
     {"key": "scrap_ball", "name": "폐 볼치",           "name_en": "Waste Ball Teeth",
      "pid": "202511190007", "unit": "USD/kg",    "w": 0.845,  "lo": 2,     "hi": 1_000,   "grp": "원료"},
     {"key": "conc65",     "name": "흑중석 정광 65%",   "name_en": "Wolframite Concentrate 65%",
@@ -1015,8 +1017,32 @@ async def _scrape_eu_news(page, t: dict) -> dict | None:
             except Exception:
                 pub = now_kst()
             cands.append((pub, (item.findtext("link") or "").strip(), title))
-    for pub, link, title in sorted(cands, reverse=True)[:4]:
+
+    # SMM RSS 는 최신 100건뿐이라 주간 기사가 자주 밀려난다 → 구글뉴스로 보강
+    try:
+        gq = urllib.parse.quote('"Tungsten Express" European scrap site:news.metal.com')
+        g = requests.get(f"https://news.google.com/rss/search?q={gq}&hl=en-US&gl=US&ceid=US:en",
+                         timeout=15, headers={"User-Agent": BROWSER_UA})
+        for item in ET.fromstring(g.content).findall(".//item")[:10]:
+            try:
+                pub = datetime.strptime((item.findtext("pubDate") or "")[:25].strip(),
+                                        "%a, %d %b %Y %H:%M:%S")
+            except Exception:
+                continue
+            if (now_kst() - pub).days > 21:
+                continue
+            cands.append((pub, (item.findtext("link") or "").strip(),
+                          (item.findtext("title") or "")))
+    except Exception as e:
+        print(f"      구글뉴스 실패({e})", end=" ")
+
+    print(f"후보 {len(cands)}건", end=" ", flush=True)
+    for pub, link, title in sorted(cands, reverse=True)[:5]:
         try:
+            if "news.google.com" in link:
+                link = await get_real_url(page, link)
+                if not link or "metal.com" not in link:
+                    continue
             await page.goto(link, wait_until="domcontentloaded", timeout=30000)
             await page.wait_for_timeout(2000)
             text = await page.inner_text("body")
@@ -1054,7 +1080,10 @@ async def scrape_prices() -> dict:
             # 페이지 하나가 통째로 멈추는 경우가 있어 상한을 둔다.
             # (첫 실행에서 황산코발트+목록페이지가 10분을 잡아먹었다)
             try:
-                r = await asyncio.wait_for(_scrape_detail(page, t), timeout=75)
+                if t.get("skip_page"):
+                    r = {"key": t["key"], "status": "ERROR: 고시 페이지 접근 불가(로그인)"}
+                else:
+                    r = await asyncio.wait_for(_scrape_detail(page, t), timeout=75)
             except asyncio.TimeoutError:
                 r = {"key": t["key"], "name": t["name"], "name_en": t["name_en"],
                      "unit": t["unit"], "grp": t["grp"], "w": t.get("w"),
