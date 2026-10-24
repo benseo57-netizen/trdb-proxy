@@ -526,14 +526,10 @@
   "co_sulph": 6479.7,
   "cn_west_x": 3.864,
   "regen_ratio": 90.14,
-  "tc_scrap_sludge_하방": -0.61,
-  "tc_scrap_sludge_기준": 101.92,
-  "tc_scrap_sludge_상방": 204.45,
-  "tc_scrap_cnc_하방": 3.05,
-  "tc_scrap_cnc_기준": 105.58,
-  "tc_scrap_cnc_상방": 208.11,
-  "tc_conc65_하방": -1.41,
-  "tc_conc65_기준": 101.12,
-  "tc_conc65_상방": 203.65
+  "scrap_ins_eu": null,
+  "tc_sludge_cn": 3.19,
+  "tc_insert_cn": 3.01,
+  "tc_conc_cn": 2.43,
+  "tc_conc_west": 40.88
  }
 ]

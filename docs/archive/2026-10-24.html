@@ -39,7 +39,7 @@
     <button onclick="dlCsv()" style="font-size:11px;padding:5px 12px;border:1px solid #cbd5e1;
             border-radius:5px;background:#fff;cursor:pointer;color:#475569;">CSV 받기</button>
   </div>
-  <div style="margin-bottom:12px;"><span style="display:inline-block;background:#b91c1c;color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:4px;margin:0 6px 4px 0;">중국-서방 3.86배</span><span style="display:inline-block;background:#047857;color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:4px;margin:0 6px 4px 0;">원가상한(기준·폐 CNC 인서트) $105.58/kg</span><span style="display:inline-block;background:#475569;color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:4px;margin:0 6px 4px 0;">재생품 가격비 90.1%</span></div>
+  <div style="margin-bottom:12px;"><span style="display:inline-block;background:#b91c1c;color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:4px;margin:0 6px 4px 0;">중국-서방 3.86배</span><span style="display:inline-block;background:#047857;color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:4px;margin:0 6px 4px 0;">원가상한 중국 내수·연삭 슬러지 $3.19/kg-WO3</span><span style="display:inline-block;background:#047857;color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:4px;margin:0 6px 4px 0;">원가상한 서방·흑중석 정광 65% $40.88/kg-WO3</span><span style="display:inline-block;background:#475569;color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:4px;margin:0 6px 4px 0;">재생품 가격비 90.1%</span></div>
   <table class="px">
     <thead><tr style="background:#f8fafc;">
       <td style="padding:10px 14px;font-size:11px;font-weight:700;color:#475569;
@@ -93,9 +93,18 @@
             <b style="font-size:13px;color:#0f2744;">폐 CNC 인서트</b><span style="display:inline-block;background:#e0f2fe;color:#075985;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;margin-left:4px;vertical-align:middle;white-space:nowrap;">10.23 고시</span><br>
             <span style="font-size:11px;color:#8f9ba8;">Waste CNC Blades</span></td>
           <td style="padding:11px 14px;border-bottom:1px solid #e8edf2;text-align:right;"><b style="font-size:13px;">$65.75</b><br><span style="color:#94a3b8;font-size:10px;">USD/kg</span></td>
-          <td style="padding:11px 14px;border-bottom:1px solid #e8edf2;text-align:right;"><b style="font-size:12px;">$77.81</b><br><span style="color:#94a3b8;font-size:10px;">/kg-W</span></td>
+          <td style="padding:11px 14px;border-bottom:1px solid #e8edf2;text-align:right;"><b style="font-size:12px;">$82.19</b><br><span style="color:#94a3b8;font-size:10px;">/kg-W</span></td>
           <td style="padding:11px 14px;border-bottom:1px solid #e8edf2;text-align:center;
                      font-weight:700;font-size:13px;color:#2471a3;">0.00%</td>
+        </tr>
+        <tr>
+          <td style="padding:11px 14px;border-bottom:1px solid #e8edf2;">
+            <b style="font-size:13px;color:#0f2744;">폐 인서트 (유럽)</b><span style="display:inline-block;background:#fee2e2;color:#b91c1c;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;margin-left:3px;vertical-align:middle;">수집실패</span><br>
+            <span style="font-size:11px;color:#8f9ba8;">Tungsten Carbide Inserts Scrap, in-whs Europe</span></td>
+          <td style="padding:11px 14px;border-bottom:1px solid #e8edf2;text-align:right;"><span style="color:#aaaaaa;">—</span></td>
+          <td style="padding:11px 14px;border-bottom:1px solid #e8edf2;text-align:right;"><span style="color:#d1d5db;">—</span></td>
+          <td style="padding:11px 14px;border-bottom:1px solid #e8edf2;text-align:center;
+                     font-weight:700;font-size:13px;color:#888888;">N/A</td>
         </tr>
         <tr>
           <td style="padding:11px 14px;border-bottom:1px solid #e8edf2;">
@@ -147,43 +156,37 @@
     <table width="100%" cellpadding="0" cellspacing="0" border="0"
            style="background:#fff;border:1px solid #e2e8f0;border-collapse:collapse;margin-top:14px;">
       <thead>
-        <tr><td colspan="5" style="padding:10px 12px;background:#1c1917;color:#fff;
+        <tr><td colspan="3" style="padding:10px 12px;background:#1c1917;color:#fff;
             font-size:12px;font-weight:700;">목표 원가 상한 · $/kg-WO3 · = CAPEX+OPEX 허용 한도</td></tr>
         <tr>
           <td style="padding:9px 12px;border-bottom:1px solid #e8edf2;font-size:12px;font-weight:700;color:#475569;background:#f8fafc;border-bottom:2px solid #e2e8f0;">원료</td>
-          <td style="padding:9px 12px;border-bottom:1px solid #e8edf2;font-size:12px;text-align:right;font-weight:700;color:#475569;background:#f8fafc;border-bottom:2px solid #e2e8f0;">원료 매입가</td>
-          <td style="padding:9px 12px;border-bottom:1px solid #e8edf2;font-size:12px;text-align:right;font-weight:700;color:#475569;background:#f8fafc;border-bottom:2px solid #e2e8f0;">하방<br><span style="font-weight:400;font-size:10px;color:#94a3b8;">중국 내수 $75.38</span></td><td style="padding:9px 12px;border-bottom:1px solid #e8edf2;font-size:12px;text-align:right;font-weight:700;color:#475569;background:#f8fafc;border-bottom:2px solid #e2e8f0;">기준<br><span style="font-weight:400;font-size:10px;color:#94a3b8;">두 시장 평균 $183.30</span></td><td style="padding:9px 12px;border-bottom:1px solid #e8edf2;font-size:12px;text-align:right;font-weight:700;color:#475569;background:#f8fafc;border-bottom:2px solid #e2e8f0;">상방<br><span style="font-weight:400;font-size:10px;color:#94a3b8;">서방 환산 $291.23</span></td>
+          <td style="padding:9px 12px;border-bottom:1px solid #e8edf2;font-size:12px;text-align:right;font-weight:700;color:#475569;background:#f8fafc;border-bottom:2px solid #e2e8f0;">중국 내수<br><span style="font-weight:400;font-size:10px;color:#94a3b8;">판매 $75.38</span></td><td style="padding:9px 12px;border-bottom:1px solid #e8edf2;font-size:12px;text-align:right;font-weight:700;color:#475569;background:#f8fafc;border-bottom:2px solid #e2e8f0;">서방<br><span style="font-weight:400;font-size:10px;color:#94a3b8;">판매 $291.23</span></td>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td style="padding:9px 12px;border-bottom:1px solid #e8edf2;font-size:12px;"><b>연삭 슬러지</b><br>
-            <span style="color:#94a3b8;font-size:10px;">SMM이 WO3 1%당 단가로 고시 — 함량 가정 불필요</span></td>
-          <td style="padding:9px 12px;border-bottom:1px solid #e8edf2;font-size:12px;text-align:right;">$72.22<br>
-            <span style="color:#94a3b8;font-size:10px;">WO3 1.11kg × $65.00</span></td>
-          <td style="padding:9px 12px;border-bottom:1px solid #e8edf2;font-size:12px;text-align:right;font-size:14px;font-weight:700;color:#b91c1c;">-$0.61</td><td style="padding:9px 12px;border-bottom:1px solid #e8edf2;font-size:12px;text-align:right;font-size:14px;font-weight:700;color:#047857;">$101.92</td><td style="padding:9px 12px;border-bottom:1px solid #e8edf2;font-size:12px;text-align:right;font-size:14px;font-weight:700;color:#047857;">$204.45</td>
+            <span style="color:#94a3b8;font-size:10px;">WO3 1%당 단가 고시 — 함량 가정 불필요</span></td>
+          <td style="padding:9px 12px;border-bottom:1px solid #e8edf2;font-size:12px;text-align:right;"><b style="font-size:14px;color:#047857;">$3.19</b><br><span style="color:#64748b;font-size:10px;">원료비 $68.42 = WO3 1.05kg × $65.00</span><br><span style="color:#94a3b8;font-size:10px;">SMM 연삭 슬러지</span></td><td style="padding:9px 12px;border-bottom:1px solid #e8edf2;font-size:12px;text-align:right;color:#94a3b8;font-size:11px;">서방 고시 시세 없음</td>
         </tr>
         <tr>
-          <td style="padding:9px 12px;border-bottom:1px solid #e8edf2;font-size:12px;"><b>폐 CNC 인서트</b><br>
-            <span style="color:#94a3b8;font-size:10px;">WC90%+Co10% 가정</span></td>
-          <td style="padding:9px 12px;border-bottom:1px solid #e8edf2;font-size:12px;text-align:right;">$68.56<br>
-            <span style="color:#94a3b8;font-size:10px;">1.04kg × $65.75</span></td>
-          <td style="padding:9px 12px;border-bottom:1px solid #e8edf2;font-size:12px;text-align:right;font-size:14px;font-weight:700;color:#047857;">$3.05</td><td style="padding:9px 12px;border-bottom:1px solid #e8edf2;font-size:12px;text-align:right;font-size:14px;font-weight:700;color:#047857;">$105.58</td><td style="padding:9px 12px;border-bottom:1px solid #e8edf2;font-size:12px;text-align:right;font-size:14px;font-weight:700;color:#047857;">$208.11</td>
+          <td style="padding:9px 12px;border-bottom:1px solid #e8edf2;font-size:12px;"><b>폐 인서트</b><br>
+            <span style="color:#94a3b8;font-size:10px;">W 80% 가정 (실거래는 분석치 정산)</span></td>
+          <td style="padding:9px 12px;border-bottom:1px solid #e8edf2;font-size:12px;text-align:right;"><b style="font-size:14px;color:#047857;">$3.01</b><br><span style="color:#64748b;font-size:10px;">원료비 $68.60 = 1.04kg × $65.75</span><br><span style="color:#94a3b8;font-size:10px;">SMM 폐 CNC 인서트</span></td><td style="padding:9px 12px;border-bottom:1px solid #e8edf2;font-size:12px;text-align:right;color:#94a3b8;font-size:11px;">원료 시세 수집실패</td>
         </tr>
         <tr>
           <td style="padding:9px 12px;border-bottom:1px solid #e8edf2;font-size:12px;"><b>흑중석 정광 65%</b><br>
             <span style="color:#94a3b8;font-size:10px;">WO3 65% → W 51.5%</span></td>
-          <td style="padding:9px 12px;border-bottom:1px solid #e8edf2;font-size:12px;text-align:right;">$73.02<br>
-            <span style="color:#94a3b8;font-size:10px;">1.71kg × $42.71</span></td>
-          <td style="padding:9px 12px;border-bottom:1px solid #e8edf2;font-size:12px;text-align:right;font-size:14px;font-weight:700;color:#b91c1c;">-$1.41</td><td style="padding:9px 12px;border-bottom:1px solid #e8edf2;font-size:12px;text-align:right;font-size:14px;font-weight:700;color:#047857;">$101.12</td><td style="padding:9px 12px;border-bottom:1px solid #e8edf2;font-size:12px;text-align:right;font-size:14px;font-weight:700;color:#047857;">$203.65</td>
+          <td style="padding:9px 12px;border-bottom:1px solid #e8edf2;font-size:12px;text-align:right;"><b style="font-size:14px;color:#047857;">$2.43</b><br><span style="color:#64748b;font-size:10px;">원료비 $69.17 = 1.62kg × $42.71</span><br><span style="color:#94a3b8;font-size:10px;">SMM 흑중석 정광 65%</span></td><td style="padding:9px 12px;border-bottom:1px solid #e8edf2;font-size:12px;text-align:right;"><b style="font-size:14px;color:#047857;">$40.88</b><br><span style="color:#64748b;font-size:10px;">원료비 $235.79 = WO3 1.05kg × $224.00</span><br><span style="color:#94a3b8;font-size:10px;">로테르담 APT $2,800/mtu × 80%</span></td>
         </tr></tbody>
     </table>
     <p style="margin:6px 2px 0;font-size:10px;color:#94a3b8;line-height:1.6;">
-      목표 원가 상한 = 판매가 − 원료 매입가 − 판매가×마진 ·
-      원료 매입가 = 원료 단가 × 0.7930 ÷ (W함량 × 회수율) · WO3 %단가 원료는 단가×100 ÷ 회수율<br>
-      <b>잠정 전제</b> — 회수율 90%(문헌 기준) ·
-      마진 5%(재무팀 확인 전) · 원료 W함량은 원료별 가정치 · 서방 환산 시 WO3/APT 프리미엄 1.040 적용 ·
-      기준 시나리오 = 중국 내수와 서방 환산의 평균(수출통제 지속 불확실성 반영)</p>
+      목표 원가 상한 = 판매가 − 원료 매입가 − 판매가×마진 · 시장별 계산(그 시장 원료를 사서 그 시장에 판매.
+      중국 원료→서방 판매는 수출통제로 제외)<br>
+      원료 매입가 = 원료 단가 × 0.7930 ÷ (W함량 × 회수율) · 함유 WO3 기준 원료는 WO3 1kg 가격 ÷ 회수율<br>
+      <b>잠정 전제</b> — 회수율 95%(문헌: 화학공정 약 97%) ·
+      마진 5%(재무팀 확인 전) · 인서트 W 80%(문헌 '80% 이상', 실거래는 분석치 정산) ·
+      서방 정광 지불률 80%(서방 장기계약 75~85%) · 서방 판매가 = 로테르담 APT 함유W × WO3/APT 프리미엄 1.040</p>
     <table width="100%" cellpadding="0" cellspacing="0" border="0"
            style="background:#fff;border:1px solid #e2e8f0;border-collapse:collapse;margin-top:14px;">
       <tbody>
@@ -375,8 +378,8 @@
       
       <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;
                   padding:16px 18px;margin-bottom:14px;">
-        <div style="font-size:13px;font-weight:700;">목표 원가 상한 · 기준 시나리오</div>
-        <div style="font-size:11px;color:#94a3b8;margin-bottom:10px;">$/kg-WO3 · 원료별 · 잠정 전제</div>
+        <div style="font-size:13px;font-weight:700;">목표 원가 상한 · 시장별</div>
+        <div style="font-size:11px;color:#94a3b8;margin-bottom:10px;">$/kg-WO3 · 실선 중국 내수 · 점선 서방 · 잠정 전제</div>
         <div style="position:relative;height:230px;"><canvas id="ch_tc"></canvas></div>
       </div>
       
@@ -396,7 +399,7 @@
       <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
       <script>
 (function() {
-  const D = {"labels": ["09-25", "09-26", "09-27", "09-28", "09-29", "09-30", "10-01", "10-02", "10-03", "10-04", "10-05", "10-06", "10-07", "10-08", "10-09", "10-10", "10-11", "10-12", "10-13", "10-14", "10-15", "10-16", "10-17", "10-18", "10-19", "10-20", "10-21", "10-22", "10-23", "10-24"], "wo3": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 75376.16], "apt_cn": [74959.47, 74959.47, 74959.47, 74467.1, 72348.67, 72368.03, 72368.03, 72368.03, 72368.03, 72368.03, 72368.03, 72368.03, 72368.03, 71050.14, 69116.6, 69116.6, 69116.6, 65942.07, 64622.26, 63315.71, 61942.16, 59362.02, 59362.02, 59362.02, 58085.29, 58137.32, 61469.03, 62811.59, 64135.85, 64135.85], "conc65": [52405.88, 52405.88, 52405.88, 51726.05, 49986.35, 49605.0, 49605.0, 49605.0, 49605.0, 49605.0, 49605.0, 49605.0, 49605.0, 48287.78, 46999.29, 46999.29, 46999.29, 44444.95, 43125.47, 41155.21, 39801.13, 38519.35, 38519.35, 38519.35, 38547.51, 38582.04, 40054.01, 41389.53, 42713.16, 42713.16], "cn_west_x": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 3.864], "tc_sludge": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 101.92], "tc_cnc": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 105.58], "tc_conc": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 101.12]};
+  const D = {"labels": ["09-25", "09-26", "09-27", "09-28", "09-29", "09-30", "10-01", "10-02", "10-03", "10-04", "10-05", "10-06", "10-07", "10-08", "10-09", "10-10", "10-11", "10-12", "10-13", "10-14", "10-15", "10-16", "10-17", "10-18", "10-19", "10-20", "10-21", "10-22", "10-23", "10-24"], "wo3": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 75376.16], "apt_cn": [74959.47, 74959.47, 74959.47, 74467.1, 72348.67, 72368.03, 72368.03, 72368.03, 72368.03, 72368.03, 72368.03, 72368.03, 72368.03, 71050.14, 69116.6, 69116.6, 69116.6, 65942.07, 64622.26, 63315.71, 61942.16, 59362.02, 59362.02, 59362.02, 58085.29, 58137.32, 61469.03, 62811.59, 64135.85, 64135.85], "conc65": [52405.88, 52405.88, 52405.88, 51726.05, 49986.35, 49605.0, 49605.0, 49605.0, 49605.0, 49605.0, 49605.0, 49605.0, 49605.0, 48287.78, 46999.29, 46999.29, 46999.29, 44444.95, 43125.47, 41155.21, 39801.13, 38519.35, 38519.35, 38519.35, 38547.51, 38582.04, 40054.01, 41389.53, 42713.16, 42713.16], "cn_west_x": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 3.864], "tc_sludge_cn": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 3.19], "tc_insert_cn": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 3.01], "tc_conc_cn": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 2.43], "tc_insert_west": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], "tc_conc_west": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 40.88]};
   const solid = D.labels.length > 20 ? 0 : 3;
   const ds = (label, data, color, dash) => ({
     label, data, borderColor: color, backgroundColor: color,
@@ -426,9 +429,11 @@
   };
   const usd = v => '$' + v.toFixed(0);
   draw('ch_tc', [
-    ds('연삭 슬러지',     D.tc_sludge, '#047857', false),
-    ds('폐 CNC 인서트',   D.tc_cnc,    '#f59e0b', false),
-    ds('흑중석 정광 65%', D.tc_conc,   '#7c3aed', true)
+    ds('중국·슬러지', D.tc_sludge_cn,  '#047857', false),
+    ds('중국·인서트', D.tc_insert_cn,  '#f59e0b', false),
+    ds('중국·정광',   D.tc_conc_cn,    '#7c3aed', false),
+    ds('서방·인서트', D.tc_insert_west,'#f59e0b', true),
+    ds('서방·정광',   D.tc_conc_west,  '#7c3aed', true)
   ], usd);
   draw('ch_cw', [
     ds('중국-서방 배수', D.cn_west_x, '#b91c1c', false)
@@ -446,14 +451,14 @@ function dlCsv() {
              '연삭슬러지_USDkg','폐CNC_USDkg','폐볼치_USDkg','정광65_USDt',
              '신품WC_USDkg','재생WC_USDkg','황산코발트_USDt',
              '중국서방_배수','재생품가격비_%',
-             '원가상한_슬러지_하방','원가상한_슬러지_기준','원가상한_슬러지_상방',
-             '원가상한_인서트_하방','원가상한_인서트_기준','원가상한_인서트_상방',
-             '원가상한_정광_하방','원가상한_정광_기준','원가상한_정광_상방','USD/CNY'];
+             '유럽인서트_USDkg',
+             '원가상한_중국_슬러지','원가상한_중국_인서트','원가상한_중국_정광',
+             '원가상한_서방_인서트','원가상한_서방_정광','USD/CNY'];
   const K = ['date','wo3','apt_cn','apt_rott','scrap_sludge','scrap_cnc','scrap_ball','conc65',
              'wc_new','wc_regen','co_sulph','cn_west_x','regen_ratio',
-             'tc_scrap_sludge_하방','tc_scrap_sludge_기준','tc_scrap_sludge_상방',
-             'tc_scrap_cnc_하방','tc_scrap_cnc_기준','tc_scrap_cnc_상방',
-             'tc_conc65_하방','tc_conc65_기준','tc_conc65_상방','usd_cny'];
+             'scrap_ins_eu',
+             'tc_sludge_cn','tc_insert_cn','tc_conc_cn',
+             'tc_insert_west','tc_conc_west','usd_cny'];
   fetch('../data/prices.json').then(r => r.json()).then(rows => {
     const csv = '\uFEFF' + [H.join(',')]
       .concat(rows.map(r => K.map(k => (r[k] == null ? '' : r[k])).join(','))).join('\n');
@@ -477,73 +482,13 @@ function dlCsv() {
                     padding:20px;margin-bottom:10px;background:#fff;">
           <div style="font-size:11px;color:#94a3b8;margin-bottom:6px;">
             <span style="background:#dcfce7;color:#15803d;padding:2px 8px;
-                         border-radius:4px;font-weight:700;">글로벌</span>
-            &nbsp;SMM Metal · 2026-10-23</div>
-          <a href="https://news.metal.com/newscontent/104176306/smm-cobalt-morning-meeting-summary-industry-chain-prices-remain-under-pressure-end-use-demand-weakness-drags-market-trend/" target="_blank" rel="noopener"
-             style="font-size:16px;font-weight:700;color:#0f2744;
-                    text-decoration:none;line-height:1.4;">[SMM Cobalt Morning Meeting Summary] Industry Chain Prices Remain Under Pressure, End-use Demand Weakness Drags Market Trend</a>
-          <p style="font-size:14px;color:#475569;line-height:1.65;margin:8px 0 0;">
-            2026년 10월 23일 SMM에 따르면, 코발트 산업 체인은 원자재 가격 하락과 최종 수요 부진으로 전반적인 약세를 보였습니다. 정제 코발트 가격은 23만 위안/톤 수준에서 일시적으로 안정화되었으나, 실제 수요 개선은 없었습니다. 코발트 분말 거래 가격은 약 28.5만 위안/톤으로 하락했으며, 텅스텐 카바이드(WC) 가격 안정화가 향후 재고 보충을 유도할 수 있다고 언급되었습니다.</p>
-        </div>
-        <h3 style="font-size:15px;font-weight:700;color:#334155;
-                   border-left:3px solid #b45309;padding-left:10px;margin:26px 0 12px;">
-          공급망 및 파트너십 <span style="color:#94a3b8;font-weight:400;">(1)</span></h3>
-        
-        <div style="border:1px solid #e2e8f0;border-radius:8px;
-                    padding:20px;margin-bottom:10px;background:#fff;">
-          <div style="font-size:11px;color:#94a3b8;margin-bottom:6px;">
-            <span style="background:#dcfce7;color:#15803d;padding:2px 8px;
-                         border-radius:4px;font-weight:700;">글로벌</span>
-            &nbsp;Investing.com 한국어 · 2026-10-21</div>
-          <a href="https://kr.investing.com/news/company-news/article-93CH-2134861" target="_blank" rel="noopener"
-             style="font-size:16px;font-weight:700;color:#0f2744;
-                    text-decoration:none;line-height:1.4;">American Resources·ReElement, 우즈베키스탄과 텅스텐 협력 합의</a>
-          <p style="font-size:14px;color:#475569;line-height:1.65;margin:8px 0 0;">
-            2026년 10월 21일 Investing.com에 따르면, American Resources와 ReElement가 우즈베키스탄과 텅스텐 협력에 합의했습니다. 이는 텅스텐 원료 확보를 위한 국제적인 공급망 구축 노력의 일환으로, 글로벌 텅스텐 시장의 원료 수급 안정화에 기여할 수 있습니다.</p>
-        </div>
-        <h3 style="font-size:15px;font-weight:700;color:#334155;
-                   border-left:3px solid #b45309;padding-left:10px;margin:26px 0 12px;">
-          투자 및 M&amp;A <span style="color:#94a3b8;font-weight:400;">(2)</span></h3>
-        
-        <div style="border:1px solid #e2e8f0;border-radius:8px;
-                    padding:20px;margin-bottom:10px;background:#fff;">
-          <div style="font-size:11px;color:#94a3b8;margin-bottom:6px;">
-            <span style="background:#dcfce7;color:#15803d;padding:2px 8px;
                          border-radius:4px;font-weight:700;">한국</span>
-            &nbsp;안동MBC · 2026-10-24</div>
-          <a href="https://andongmbc.co.kr/main/news/news_view.php?num=84240&amp;sfl=REPORTER_NAME&amp;stx=%EA%B6%8C%EA%B8%B0%EB%A7%8C" target="_blank" rel="noopener"
+            &nbsp;쿠키뉴스 · 2026년 10월 24일</div>
+          <a href="https://www.kukinews.com/article/view/kuk202603170135" target="_blank" rel="noopener"
              style="font-size:16px;font-weight:700;color:#0f2744;
-                    text-decoration:none;line-height:1.4;">월R] 다시 움직인 광산.. 텅스텐 &quot;최소 5천억 원&quot;</a>
+                    text-decoration:none;line-height:1.4;">영월 상동광산 32년 만에 재가동…텅스텐 생산 본격화</a>
           <p style="font-size:14px;color:#475569;line-height:1.65;margin:8px 0 0;">
-            2026년 10월 24일 안동MBC 보도에 따르면, 국내 텅스텐 광산이 다시 움직이며 최소 5천억 원 규모의 가치를 가질 것으로 예상됩니다. 이는 1차 원료 공급 증가 가능성을 시사하며, 텅스텐 리사이클링 시장의 원료 수급 환경에 영향을 미칠 수 있습니다.</p>
-        </div>
-        <div style="border:1px solid #e2e8f0;border-radius:8px;
-                    padding:20px;margin-bottom:10px;background:#fff;">
-          <div style="font-size:11px;color:#94a3b8;margin-bottom:6px;">
-            <span style="background:#dcfce7;color:#15803d;padding:2px 8px;
-                         border-radius:4px;font-weight:700;">글로벌</span>
-            &nbsp;TradingView · 2026-10-22</div>
-          <a href="https://es.tradingview.com/news/tmx_newsfile:f45c821cf094b:0-moon-river-moly-announces-robust-updated-preliminary-economic-assessment-of-davidson-molybdenum-copper-tungsten-critical-minerals-project-demonstrating-improved-economics/" target="_blank" rel="noopener"
-             style="font-size:16px;font-weight:700;color:#0f2744;
-                    text-decoration:none;line-height:1.4;">Moon River Moly Announces Robust Updated Preliminary Economic Assessment of Davidson Molybdenum-Copper-Tungsten Critical Minerals Project Demonstrating Improved Economics</a>
-          <p style="font-size:14px;color:#475569;line-height:1.65;margin:8px 0 0;">
-            2026년 10월 22일 TradingView에 따르면, Moon River Moly는 Davidson 몰리브덴-구리-텅스텐 핵심 광물 프로젝트의 업데이트된 예비 경제성 평가(PEA)를 발표했습니다. 이 평가에서 텅스텐 광물 자원이 상향 조정되었고, 연간 텅스텐 생산량이 이전 PEA 대비 350% 증가할 것으로 예상됩니다. 세전 순현재가치(NPV)는 21.5억 달러, 내부수익률(IRR)은 44%로 개선된 경제성을 보여주었습니다.</p>
-        </div>
-        <h3 style="font-size:15px;font-weight:700;color:#334155;
-                   border-left:3px solid #b45309;padding-left:10px;margin:26px 0 12px;">
-          기술 및 공정 <span style="color:#94a3b8;font-weight:400;">(1)</span></h3>
-        
-        <div style="border:1px solid #e2e8f0;border-radius:8px;
-                    padding:20px;margin-bottom:10px;background:#fff;">
-          <div style="font-size:11px;color:#94a3b8;margin-bottom:6px;">
-            <span style="background:#dcfce7;color:#15803d;padding:2px 8px;
-                         border-radius:4px;font-weight:700;">한국</span>
-            &nbsp;디지털데일리 · 2026-10-22</div>
-          <a href="https://www.ddaily.co.kr/page/view/2026102120083235842" target="_blank" rel="noopener"
-             style="font-size:16px;font-weight:700;color:#0f2744;
-                    text-decoration:none;line-height:1.4;">머크 신임 CEO 첫 방한… &quot;텅스텐 깰 `몰리브덴` 충북 음성서 양산&quot;</a>
-          <p style="font-size:14px;color:#475569;line-height:1.65;margin:8px 0 0;">
-            2026년 10월 22일 디지털데일리 보도(한스경제 등 복수 보도)에 따르면, 머크의 신임 CEO가 방한하여 충북 음성에서 차세대 금속 소재인 몰리브덴을 양산할 계획을 밝혔습니다. 머크는 반도체 미세화 및 고적층 경쟁으로 인한 기존 텅스텐 소재의 기술적 한계를 지적하며, 몰리브덴 기반의 이산화이염화몰리브덴(MoO₂Cl₂) 생산설비를 음성에 구축할 예정입니다. 이는 텅스텐의 대체재 개발 및 양산 소식으로, 반도체 분야에서의 텅스텐 수요에 영향을 줄 수 있습니다.</p>
+            강원도 영월 상동광산이 32년 만에 재가동을 시작하며 텅스텐 생산을 본격화합니다. 이는 국내 텅스텐 1차 원료 공급에 중요한 변화를 가져올 것으로 예상됩니다. 과거 국내 텅스텐 생산의 핵심 거점이었던 상동광산의 재가동은 재생 원료와 경쟁 구도를 형성할 수 있습니다.</p>
         </div>
 
   <h2 class="sec">오늘의 산업 흐름</h2>
@@ -552,25 +497,17 @@ function dlCsv() {
                     margin-bottom:12px;border-radius:0 6px 6px 0;">
           <div style="font-size:11px;font-weight:800;color:#b45309;">TREND 01</div>
           <div style="font-size:15px;font-weight:700;color:#0f2744;margin:6px 0 8px;">
-            1차 텅스텐 원료 공급 확대 및 투자 증가</div>
+            1차 텅스텐 원료 공급 확대 조짐</div>
           <div style="font-size:14px;color:#475569;line-height:1.65;">
-            국내 텅스텐 광산 재개 소식과 Moon River Moly 프로젝트의 텅스텐 생산량 350% 증가는 전 세계적으로 1차 텅스텐 원료 공급이 확대되고 있음을 시사합니다. 이는 재생 텅스텐 원료 시장에 경쟁 압력으로 작용할 수 있습니다.</div>
+            영월 상동광산이 32년 만에 재가동되어 텅스텐 생산을 본격화함에 따라, 국내 1차 텅스텐 원료 공급이 확대될 조짐을 보입니다. 이는 재생 텅스텐 원료 시장에 새로운 경쟁 구도를 형성할 수 있습니다.</div>
         </div>
         <div style="border-left:4px solid #b45309;background:#fff;padding:16px 18px;
                     margin-bottom:12px;border-radius:0 6px 6px 0;">
           <div style="font-size:11px;font-weight:800;color:#b45309;">TREND 02</div>
           <div style="font-size:15px;font-weight:700;color:#0f2744;margin:6px 0 8px;">
-            반도체 분야 텅스텐 대체재 개발 및 양산 가속화</div>
+            텅스텐 원자재 가격 전반적 상승세</div>
           <div style="font-size:14px;color:#475569;line-height:1.65;">
-            머크가 반도체 미세화 공정에서 텅스텐의 한계를 지적하며 몰리브덴 양산 계획을 발표했습니다. 이는 텅스텐의 주요 전방 산업 중 하나인 반도체 분야에서 대체 소재로의 전환이 가속화될 수 있음을 보여줍니다.</div>
-        </div>
-        <div style="border-left:4px solid #b45309;background:#fff;padding:16px 18px;
-                    margin-bottom:12px;border-radius:0 6px 6px 0;">
-          <div style="font-size:11px;font-weight:800;color:#b45309;">TREND 03</div>
-          <div style="font-size:15px;font-weight:700;color:#0f2744;margin:6px 0 8px;">
-            글로벌 텅스텐 공급망 다변화 노력 지속</div>
-          <div style="font-size:14px;color:#475569;line-height:1.65;">
-            American Resources와 ReElement가 우즈베키스탄과 텅스텐 협력에 합의한 것은 핵심 광물인 텅스텐의 안정적인 확보를 위한 글로벌 공급망 다변화 노력이 계속되고 있음을 나타냅니다.</div>
+            WO3 산화텅스텐이 +2.70%, 중국 내수 APT가 +2.11%, 흑중석 정광 65%가 +3.19% 상승하는 등 주요 텅스텐 원자재 가격이 전반적으로 상승세를 보이고 있습니다. 이는 견조한 시장 수요 또는 공급 측면의 압박을 반영하는 것으로 해석됩니다.</div>
         </div>
 
   <h2 class="sec">리사이클링 사업자 관점 시사점</h2>
@@ -580,31 +517,31 @@ function dlCsv() {
           <td valign="top" style="width:22px;color:#d97706;font-size:15px;
                                   line-height:1.7;padding-top:2px;">&#9658;</td>
           <td style="font-size:14px;color:#451a03;line-height:1.7;
-                     padding-bottom:14px;">WO3 산화텅스텐 가격은 전일 대비 2.70% 상승한 $75,376.16/t (W환산 $95.05/kg-W)을 기록했으며, 폐 볼치 가격도 3.30% 상승했습니다. 중국-서방 APT(파라텅스텐산암모늄) 배수는 3.86배로 여전히 높아, 서방 시장으로의 WO3 판매 시 높은 수익성을 기대할 수 있습니다. 현재 목표 원가 상한 기준 시나리오에서 연삭 슬러지($101.92/kg-WO3)와 폐 CNC 인서트($105.58/kg-WO3)는 잠정적인 회수율 및 마진 전제 하에 충분한 마진을 확보할 수 있는 수준이므로, 안정적인 원료 매입이 중요합니다.</td>
+                     padding-bottom:14px;">현재 CIF 로테르담 APT 가격이 중국 내수 APT 대비 3.86배 높은 수준을 유지하며 서방 시장의 높은 프리미엄을 명확히 보여줍니다. 이는 서방 시장 판매를 목표로 할 경우, 중국 내수 시장 대비 최대 10배 이상 높은 목표 원가 상한(예: 서방 흑중석 정광 65% $40.88/kg-WO3 vs 중국 내수 $2.43/kg-WO3)을 확보할 수 있어 WO3 사업의 높은 수익성을 시사합니다.</td>
         </tr>
         <tr>
           <td valign="top" style="width:22px;color:#d97706;font-size:15px;
                                   line-height:1.7;padding-top:2px;">&#9658;</td>
           <td style="font-size:14px;color:#451a03;line-height:1.7;
-                     padding-bottom:14px;">American Resources와 ReElement의 우즈베키스탄과의 텅스텐 협력 합의는 글로벌 텅스텐 공급망 다변화 및 안정화 추세를 보여줍니다. 이는 향후 원료 수급 경쟁 심화 또는 새로운 공급 채널 형성 가능성을 시사하므로, 다양한 원료 매입처 발굴 노력을 지속해야 합니다.</td>
+                     padding-bottom:14px;">영월 상동광산의 32년 만의 재가동으로 국내 1차 텅스텐 원료 공급이 본격화됩니다. 이는 재생 텅스텐 원료와 경쟁 구도를 형성하며, 국내 원료 확보 전략 수립 시 1차 원료 공급량 변화를 면밀히 주시해야 함을 의미합니다.</td>
         </tr>
         <tr>
           <td valign="top" style="width:22px;color:#d97706;font-size:15px;
                                   line-height:1.7;padding-top:2px;">&#9658;</td>
           <td style="font-size:14px;color:#451a03;line-height:1.7;
-                     padding-bottom:14px;">국내 텅스텐 광산 재개 소식과 Moon River Moly 프로젝트의 텅스텐 생산량 350% 증가는 1차 텅스텐 원료 공급 증가 가능성을 나타냅니다. 이는 재생 텅스텐 원료와의 경쟁 심화로 이어질 수 있으므로, 재생 원료의 가격 경쟁력 확보 및 안정적인 스크랩 수급처 관리가 더욱 중요해질 것입니다.</td>
+                     padding-bottom:14px;">상동광산의 텅스텐 생산 본격화는 국내 텅스텐 공급망 안정화에 기여할 수 있습니다. 이는 장기적으로 수입 의존도를 낮추고 국내 산업의 안정적인 원료 수급 기반을 마련하는 긍정적인 요인으로 작용할 것입니다.</td>
         </tr>
         <tr>
           <td valign="top" style="width:22px;color:#d97706;font-size:15px;
                                   line-height:1.7;padding-top:2px;">&#9658;</td>
           <td style="font-size:14px;color:#451a03;line-height:1.7;
-                     padding-bottom:14px;">머크가 반도체 분야에서 텅스텐의 기술적 한계를 지적하며 몰리브덴 양산 계획을 발표한 것은, 장기적으로 반도체 산업 내 텅스텐 수요에 변화를 가져올 수 있음을 의미합니다. WO3의 주요 수요처 중 하나인 반도체 산업의 소재 변화 동향을 면밀히 주시하고, 다른 전방 산업(초경공구, 특수강, 촉매 등)의 수요 변화에 대한 분석을 강화해야 합니다.</td>
+                     padding-bottom:14px;">국내 텅스텐 리사이클링 신규 사업자는 상동광산 재가동으로 인한 국내 1차 원료 시장의 변화를 고려하여 원료 매입처 다변화 및 가격 경쟁력 확보 전략을 재검토해야 합니다. 특히, 국내 스크랩 발생량 및 가격에 미칠 영향을 분석하여 최적의 원료 확보 방안을 모색해야 합니다.</td>
         </tr>
         <tr>
           <td valign="top" style="width:22px;color:#d97706;font-size:15px;
                                   line-height:1.7;padding-top:2px;">&#9658;</td>
           <td style="font-size:14px;color:#451a03;line-height:1.7;
-                     padding-bottom:14px;">코발트 산업 체인의 약세에도 불구하고 텅스텐 카바이드(WC) 가격의 안정화가 향후 재고 보충을 유도할 수 있다는 SMM의 분석에 따라, 단기적으로 텅스텐 관련 제품의 수요는 소폭 개선될 가능성이 있습니다.</td>
+                     padding-bottom:14px;">단기적으로 WO3 산화텅스텐 및 APT(Ammonium Paratungstate) 등 주요 텅스텐 원자재 가격이 상승세를 보이며 시장의 강세가 지속될 것으로 예상됩니다. 국내 상동광산 재가동 소식은 중장기적인 관점에서 국내 원료 수급 다변화 및 안정화에 긍정적인 모멘텀을 제공할 것입니다.</td>
         </tr></table>
   </div>
 
