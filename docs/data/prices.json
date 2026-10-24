@@ -526,9 +526,10 @@
   "co_sulph": 6479.7,
   "cn_west_x": 3.864,
   "regen_ratio": 90.14,
-  "scrap_ins_eu": null,
+  "scrap_ins_eu": 81.14925,
   "tc_sludge_cn": 3.19,
   "tc_insert_cn": 3.01,
+  "tc_insert_west": 192.0,
   "tc_conc_cn": 2.43,
   "tc_conc_west": 40.88
  }
