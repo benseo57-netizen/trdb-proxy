@@ -130,7 +130,7 @@ TARGET_COST = {
     "recovery": 0.90,   # 회수율 (문헌 조사 기준 잠정)
     # 원료별 W 함량 (가정). key 는 SPOT_TARGETS 의 key
     "feeds": [
-        ("scrap_sludge", 0.30,   "연삭 슬러지",     "W 30% 가정 — 실분석치로 교체 필요"),
+        ("scrap_sludge", None,   "연삭 슬러지",     "WO3 1%당 단가 고시 — 함량 가정 불필요"),
         ("scrap_cnc",    0.845,  "폐 CNC 인서트",   "WC90%+Co10% 가정"),
         ("conc65",       0.5154, "흑중석 정광 65%", "WO3 65% → W 51.5%"),
     ],
@@ -510,7 +510,7 @@ _GATE_COMPANIES = tuple(sorted(
     {kw for kw, pt in _SCORE_COMPANY
      if pt >= 9 and (len(kw) >= 4 or re.search(r"[가-힣一-鿿]", kw))}))
 
-MIN_SCORE    = 8      # 텅스텐은 기사가 적어 BRDB(10)보다 낮춤
+MIN_SCORE    = 5      # 텅스텐 게이트를 통과한 기사만 오므로 문턱은 낮게 (10/24 실행: 8점 이상 2건뿐)
 TARGET_TOTAL = 60
 
 
@@ -708,24 +708,41 @@ async def _scrape_detail(page, t: dict) -> dict:
 
         usd_vals = [_mid(m) for m in _USD_PAIR_RE.finditer(text)]
         cny_vals = [_mid(m) for m in _CNY_PAIR_RE.finditer(text)]
-        if not usd_vals:
-            print(f"\n      [진단] {t['key']} 페이지 앞부분: {_peek(text)}")
-            return {**base, "status": "ERROR: USD 파싱 실패"}
+        per_wo3 = False
 
-        if t.get("novat") or len(usd_vals) < 2:
-            usd_excl = usd_vals[0]
+        if usd_vals:
+            # 형식 A — "112.00 ⏎ USD/kg" 처럼 값+단위, 증치세 포함/제외 2개 병기
+            if t.get("novat") or len(usd_vals) < 2:
+                usd_excl = usd_vals[0]
+            else:
+                usd_excl = min(usd_vals[0], usd_vals[1])
+            cny_incl = cny_vals[0] if cny_vals else None
+            cny_excl = round(cny_incl / VAT_RATE) if cny_incl else None
+            if t.get("novat"):
+                cny_excl = cny_incl
         else:
-            usd_excl = min(usd_vals[0], usd_vals[1])
-
-        cny_incl = cny_vals[0] if cny_vals else None
-        cny_excl = round(cny_incl / VAT_RATE) if cny_incl else None
-        if t.get("novat"):
-            cny_excl = cny_incl
+            # 형식 B — 스크랩·해외가 페이지.
+            #   "Waste CNC Blades Price, USD/kg ⏎ … Exclusive of VAT ⏎ … Avg.:65.75"
+            #   단위는 제목에, 값은 'Avg.:' 뒤에 있다. 증치세는 한 값만 고시.
+            mu = re.search(r"Price,\s*(USD\s*/\s*[^\n]+)", text)
+            ma = re.search(r"Avg\.?\s*:\s*([\d,]+(?:\.\d+)?)", text)
+            if not (mu and ma):
+                print(f"\n      [진단] {t['key']} 페이지 앞부분: {_peek(text)}")
+                return {**base, "status": "ERROR: USD 파싱 실패"}
+            unit_txt = mu.group(1).strip()
+            usd_excl = float(ma.group(1).replace(",", ""))
+            if re.search(r"Inclusive of VAT", text, re.I):
+                usd_excl /= VAT_RATE
+            # 연삭 슬러지는 'USD/kg·%wo₃' — WO3 1%당 kg 단가다 (함량 비례 가격)
+            per_wo3 = bool(re.search(r"%\s*wo", unit_txt, re.I))
+            if per_wo3:
+                base["unit"] = "USD/kg·%WO3"
+            cny_incl = cny_excl = None
 
         if not (t["lo"] < usd_excl < t["hi"]):
             return {**base, "status": f"ERROR: 범위 이탈 ({usd_excl})"}
 
-        pcts = re.findall(r"[+\-][\d,]+\.?\d*\s*\(([+\-]?\d+\.?\d*%)\)", text)
+        pcts = re.findall(r"[+\-]?[\d,]+\.?\d*\s*\(([+\-]?\d+\.?\d*%)\)", text)
         change = next((p for p in pcts if p != "0%"), ("0.00%" if pcts else "N/A"))
 
         today  = now_kst().date()
@@ -739,7 +756,10 @@ async def _scrape_detail(page, t: dict) -> dict:
         # W 금속 환산 (USD/kg-W). 회수율 미반영 순수 함량 기준.
         usd_kg_w = None
         w = t.get("w")
-        if w:
+        if per_wo3:
+            # WO3 1%당 단가 × 100 = 함유 WO3 1kg 가격 → ÷0.793 = 함유 W 1kg 가격
+            usd_kg_w = usd_excl * 100 / W_IN_WO3
+        elif w:
             u = t["unit"]
             if u == "USD/kg":
                 usd_kg_w = usd_excl / w
@@ -752,7 +772,7 @@ async def _scrape_detail(page, t: dict) -> dict:
             **base, "url": url,
             "date": date_txt, "usd_excl": usd_excl,
             "cny_incl": cny_incl, "cny_excl": cny_excl,
-            "usd_kg_w": usd_kg_w, "change_pct": change,
+            "usd_kg_w": usd_kg_w, "change_pct": change, "per_wo3": per_wo3,
             "basis": basis, "delayed": stale, "status": "OK",
         }
         # 코발트는 금속 환산 라벨이 별도
@@ -791,7 +811,17 @@ def _parse_list_page(text: str) -> dict:
     '가격범위가 바로 뒤(3줄 이내)에 오는' 줄만 진짜 데이터 행으로 본다.
     """
     lines = [l.strip() for l in text.split("\n")]
-    norm  = [_norm_line(l) for l in lines]
+    # 실제 페이지: "1# Tungsten bar (USD/kg)" — 품목명 끝의 (단위)를 떼고 비교한다
+    unit_of = {}
+    stripped = []
+    for i, l in enumerate(lines):
+        m = re.match(r"^(.*?)\s*\((USD\s*/\s*[^()]+)\)\s*$", l)
+        if m:
+            unit_of[i] = m.group(2).strip()
+            stripped.append(m.group(1))
+        else:
+            stripped.append(l)
+    norm  = [_norm_line(l) for l in stripped]
 
     cand = {}
     for i, nl in enumerate(norm):
@@ -819,7 +849,8 @@ def _parse_list_page(text: str) -> dict:
                 continue                                   # 섹션 헤더 → 탈락
             win = "\n".join(ln for _, ln in nxt[:6])
             mu  = _LIST_UNIT_RE.search(win)
-            if mu is None:
+            unit = unit_of.get(i) or (f"USD/{mu.group(1)}" if mu else None)
+            if unit is None:
                 continue                                   # 단위 없으면 데이터 행 아님
             md = re.search(rf"({_MON_RE}\s+\d{{1,2}},\s*\d{{4}})", win)
             try:
@@ -828,7 +859,7 @@ def _parse_list_page(text: str) -> dict:
             except ValueError:
                 continue
             row = {"low": low, "high": high,
-                   "unit": f"USD/{mu.group(1)}", "date": md.group(1) if md else ""}
+                   "unit": unit, "date": md.group(1) if md else ""}
             if best is None or dist < best[0]:
                 best = (dist, row)
         if best:
@@ -929,11 +960,19 @@ def compute_target_cost(m: dict) -> dict | None:
             rows.append({"key": key, "label": label, "note": note, "ok": False})
             continue
         px = r["usd_excl"]
-        px_kg = px / 1000.0 if r["unit"] in ("USD/t", "USD/std t") else px
-        need = W_IN_WO3 / (cont * rec)
+        if r.get("per_wo3"):
+            # WO3 1%당 단가로 고시되는 원료 — 함유 WO3 1kg 값 = 단가 × 100.
+            # 원료 함량과 무관하게 '제품 WO3 1kg' 원료비 = 단가×100 ÷ 회수율.
+            px_kg = px * 100            # 함유 WO3 1kg당
+            need = 1.0 / rec            # 함유 WO3 kg / 제품 WO3 kg
+            cont = None
+            note = "SMM이 WO3 1%당 단가로 고시 — 함량 가정 불필요"
+        else:
+            px_kg = px / 1000.0 if r["unit"] in ("USD/t", "USD/std t") else px
+            need = W_IN_WO3 / (cont * rec)
         feed_cost = need * px_kg
         rows.append({
-            "key": key, "label": label, "note": note, "ok": True,
+            "key": key, "label": label, "note": note, "ok": True, "per_wo3": bool(r.get("per_wo3")),
             "content": cont, "price": px_kg, "need": need, "feed_cost": feed_cost,
             "caps": [p - feed_cost - p * mg for _, _, p in scen],
         })
@@ -1006,7 +1045,9 @@ def format_price_for_prompt(price_data: dict, usd_cny: float, spreads: dict) -> 
                 L.append(f"  {r['label']}: 원료 시세 수집실패")
                 continue
             caps = " / ".join(f"{a} {_usd(c)}" for (a, _, _), c in zip(tc["scen"], r["caps"]))
-            L.append(f"  {r['label']} (W {r['content']*100:.1f}% 가정, 원료비 ${r['feed_cost']:,.2f}): {caps}")
+            basis = ("WO3 1%당 단가 기준" if r.get("per_wo3")
+                     else f"W {r['content']*100:.1f}% 가정")
+            L.append(f"  {r['label']} ({basis}, 원료비 ${r['feed_cost']:,.2f}): {caps}")
 
     ex = price_data.get("extras") or {}
     if ex:
@@ -1621,7 +1662,7 @@ def _price_rows(price_data: dict) -> str:
         pct = r.get("change_pct", "N/A") if ok else "N/A"
 
         if ok:
-            nd    = 2 if r["unit"] in ("USD/kg", "USD/mtu") else 0
+            nd    = 2 if (r["unit"].startswith("USD/kg") or r["unit"] == "USD/mtu") else 0
             price = (f'<b style="font-size:13px;">{_fmt(r["usd_excl"], "$", nd)}</b>'
                      f'<br><span style="color:#94a3b8;font-size:10px;">{esc(r["unit"])}</span>')
             if r.get("usd_kg_w"):
@@ -1681,7 +1722,9 @@ def _spread_table(spreads: dict) -> str:
           <td style="{TD}"><b>{esc(r['label'])}</b><br>
             <span style="color:#94a3b8;font-size:10px;">{esc(r['note'])}</span></td>
           <td style="{TDR}">${r['feed_cost']:,.2f}<br>
-            <span style="color:#94a3b8;font-size:10px;">{r['need']:.2f}kg × ${r['price']:,.2f}</span></td>
+            <span style="color:#94a3b8;font-size:10px;">{
+              (f"WO3 {r['need']:.2f}kg × ${r['price']:,.2f}") if r.get('per_wo3')
+              else (f"{r['need']:.2f}kg × ${r['price']:,.2f}")}</span></td>
           {cells}
         </tr>"""
         prem = f" · 서방 환산 시 WO3/APT 프리미엄 {tc['prem']:.3f} 적용" if tc.get("prem") else ""
@@ -1701,7 +1744,7 @@ def _spread_table(spreads: dict) -> str:
     </table>
     <p style="margin:6px 2px 0;font-size:10px;color:#94a3b8;line-height:1.6;">
       목표 원가 상한 = 판매가 − 원료 매입가 − 판매가×마진 ·
-      원료 매입가 = 원료 단가 × 0.7930 ÷ (W함량 × 회수율)<br>
+      원료 매입가 = 원료 단가 × 0.7930 ÷ (W함량 × 회수율) · WO3 %단가 원료는 단가×100 ÷ 회수율<br>
       <b>잠정 전제</b> — 회수율 {tc['recovery']*100:.0f}%(문헌 기준) ·
       마진 {tc['margin']*100:.0f}%(재무팀 확인 전) · 원료 W함량은 원료별 가정치{prem} ·
       기준 시나리오 = 중국 내수와 서방 환산의 평균(수출통제 지속 불확실성 반영)</p>"""
