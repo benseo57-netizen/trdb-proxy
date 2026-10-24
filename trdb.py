@@ -8,7 +8,11 @@ BRDB와 달라진 핵심
        목표 원가 상한 = WO3 판매가 − 원료 매입가 − 요구 마진
        원료 매입가    = 원료 시세 × (WO3 1kg에 필요한 원료 kg)
                       = 원료 시세 × 0.7930 ÷ (원료 W함량 × 회수율)
-     판매가는 3개 시나리오: 하방(중국 내수) / 기준(두 시장 평균) / 상방(서방)
+     시장별로 따로 계산한다 — 그 시장의 원료를 사서 그 시장에 판다.
+       중국 내수 : SMM 중국 원료가 → SMM 중국 WO3
+       서방      : 유럽 스크랩 시세 / 로테르담 APT × 정광 지불률
+                   → 로테르담 APT 환산 WO3
+     (중국 원료를 사서 서방에 파는 조합은 수출통제로 성립하지 않아 넣지 않는다)
      → 남는 금액이 CAPEX+OPEX 허용 한도(kg-WO3당)
   ※ 예전 버전의 '지불률(폐 인서트 ÷ 신품 WC 분말)'은 지불률 정의에 맞지
      않아 폐기했다. 지불률의 분모는 원료 내 함유 금속가치여야 한다.
@@ -90,7 +94,9 @@ def utcnow() -> datetime:
 #         APT   0.885 x 0.7930          = 0.7017
 #         WC    183.84/195.85           = 0.9387
 #         정광  0.65  x 0.7930          = 0.5154
-#         초경 스크랩 WC90%+Co10% 가정  = 0.845   ← 가정치
+#         초경 인서트 스크랩            = 0.80    ← Sumitomo 기술논문 'W 80% 이상'
+#                                           (SMM 규격 WC≥80%. 실거래는 분석치 정산)
+#         볼치                          = 0.845   ← 가정치 (표시용)
 #         연삭 슬러지는 함량 편차가 커서 아래 TARGET_COST 에서 따로 관리
 #   lo/hi: 파싱 오류 방지용 허용 범위
 SPOT_TARGETS = [
@@ -107,7 +113,10 @@ SPOT_TARGETS = [
     {"key": "scrap_sludge","name": "연삭 슬러지",      "name_en": "Tungsten Steel Scrap from Grinding Process",
      "pid": "202206070003", "unit": "USD/kg",    "w": None,   "lo": 0.05,  "hi": 200,     "grp": "원료"},
     {"key": "scrap_cnc",  "name": "폐 CNC 인서트",     "name_en": "Waste CNC Blades",
-     "pid": "202307200004", "unit": "USD/kg",    "w": 0.845,  "lo": 2,     "hi": 1_000,   "grp": "원료"},
+     "pid": "202307200004", "unit": "USD/kg",    "w": 0.80,   "lo": 2,     "hi": 1_000,   "grp": "원료"},
+    {"key": "scrap_ins_eu","name": "폐 인서트 (유럽)", "name_en": "Tungsten Carbide Inserts Scrap, in-whs Europe",
+     "pid": "202602030003", "unit": "USD/kg",    "w": 0.80,   "lo": 2,     "hi": 1_000,   "grp": "원료",
+     "novat": True, "eur": True},   # EUR/kg 주간 고시(목) → USD 환산
     {"key": "scrap_ball", "name": "폐 볼치",           "name_en": "Waste Ball Teeth",
      "pid": "202511190007", "unit": "USD/kg",    "w": 0.845,  "lo": 2,     "hi": 1_000,   "grp": "원료"},
     {"key": "conc65",     "name": "흑중석 정광 65%",   "name_en": "Wolframite Concentrate 65%",
@@ -127,12 +136,16 @@ SPOT_TARGETS = [
 #    private repo 로 옮기거나 Secrets 로 주입할 것.
 TARGET_COST = {
     "margin":   0.05,   # 요구 마진율 (잠정 — 재무팀 확인 필요)
-    "recovery": 0.90,   # 회수율 (문헌 조사 기준 잠정)
-    # 원료별 W 함량 (가정). key 는 SPOT_TARGETS 의 key
+    "recovery": 0.95,   # 회수율 (문헌: Sumitomo 화학공정 약 97%, 초기 목표 95%)
+    # 서방 정광 지불률 — 서방 제련소 장기계약은 로테르담 APT의 75~85% (SMM). 중간값.
+    "west_conc_payable": 0.80,
+    # 원료별 시장 매핑: (표시명, 중국 원료 key, 서방 원료 key, W함량, 비고)
+    #   서방 정광은 시세 페이지가 없어 'conc_west' = 로테르담 APT × 지불률로 만든다.
+    #   서방 슬러지는 고시 시세가 없다.
     "feeds": [
-        ("scrap_sludge", None,   "연삭 슬러지",     "WO3 1%당 단가 고시 — 함량 가정 불필요"),
-        ("scrap_cnc",    0.845,  "폐 CNC 인서트",   "WC90%+Co10% 가정"),
-        ("conc65",       0.5154, "흑중석 정광 65%", "WO3 65% → W 51.5%"),
+        ("연삭 슬러지",     "scrap_sludge", None,           None,   "WO3 1%당 단가 고시 — 함량 가정 불필요"),
+        ("폐 인서트",       "scrap_cnc",    "scrap_ins_eu", 0.80,   "W 80% 가정 (실거래는 분석치 정산)"),
+        ("흑중석 정광 65%", "conc65",       "conc_west",    0.5154, "WO3 65% → W 51.5%"),
     ],
 }
 W_IN_WO3 = 183.84 / 231.84          # 0.7930
@@ -659,6 +672,24 @@ def get_usd_cny_rate() -> float:
         return 7.15
 
 
+_EUR_USD = None
+
+
+def get_eur_usd_rate() -> float:
+    """유럽 스크랩(EUR/kg) 환산용. 한 번만 조회한다."""
+    global _EUR_USD
+    if _EUR_USD:
+        return _EUR_USD
+    try:
+        r = requests.get("https://api.frankfurter.app/latest?from=EUR&to=USD", timeout=10)
+        _EUR_USD = r.json()["rates"]["USD"]
+        print(f"  환율: 1 EUR = {_EUR_USD:.4f} USD", end=" ")
+    except Exception as e:
+        print(f"  EUR 환율 조회 실패({e}) — 기본값 1.10", end=" ")
+        _EUR_USD = 1.10
+    return _EUR_USD
+
+
 # ============================================================
 # 시세 — 상세 페이지
 # ============================================================
@@ -675,6 +706,8 @@ _NUM = r"[\d]{1,3}(?:,\d{3})*(?:\.\d+)?"
 # 줄바꿈이 없을 수도 있어 \s* 로 둔다. 범위면 중간값을 쓴다.
 _USD_PAIR_RE = re.compile(
     rf"({_NUM})(?:\s*[-–~]\s*({_NUM}))?\s*USD\s*/\s*(?:{_UNIT_ALT})", re.IGNORECASE)
+_EUR_PAIR_RE = re.compile(
+    rf"({_NUM})(?:\s*[-–~]\s*({_NUM}))?\s*EUR\s*/\s*(?:{_UNIT_ALT})", re.IGNORECASE)
 _CNY_PAIR_RE = re.compile(
     rf"({_NUM})(?:\s*[-–~]\s*({_NUM}))?\s*yuan\s*/\s*(?:{_UNIT_ALT})", re.IGNORECASE)
 
@@ -709,6 +742,23 @@ async def _scrape_detail(page, t: dict) -> dict:
         usd_vals = [_mid(m) for m in _USD_PAIR_RE.finditer(text)]
         cny_vals = [_mid(m) for m in _CNY_PAIR_RE.finditer(text)]
         per_wo3 = False
+        eur_orig = None
+
+        # 유럽 스크랩 — EUR/kg 고시. 페이지 다른 곳의 USD 값을 잡지 않도록
+        # EUR 값을 먼저 찾는다.
+        eur_vals = [_mid(m) for m in _EUR_PAIR_RE.finditer(text)] if t.get("eur") else []
+        if t.get("eur") and not eur_vals:
+            mu = re.search(r"Price,\s*EUR\s*/[^\n]+", text)
+            ma = re.search(r"Avg\.?\s*:\s*([\d,]+(?:\.\d+)?)", text)
+            if mu and ma:
+                eur_vals = [float(ma.group(1).replace(",", ""))]
+        if t.get("eur"):
+            if not eur_vals:
+                print(f"\n      [진단] {t['key']} 페이지 앞부분: {_peek(text)}")
+                return {**base, "status": "ERROR: EUR 파싱 실패"}
+            eur_orig = eur_vals[0]
+            usd_vals = [eur_orig * get_eur_usd_rate()]
+            cny_vals = []
 
         if usd_vals:
             # 형식 A — "112.00 ⏎ USD/kg" 처럼 값+단위, 증치세 포함/제외 2개 병기
@@ -773,6 +823,7 @@ async def _scrape_detail(page, t: dict) -> dict:
             "date": date_txt, "usd_excl": usd_excl,
             "cny_incl": cny_incl, "cny_excl": cny_excl,
             "usd_kg_w": usd_kg_w, "change_pct": change, "per_wo3": per_wo3,
+            "eur_orig": eur_orig,
             "basis": basis, "delayed": stale, "status": "OK",
         }
         # 코발트는 금속 환산 라벨이 별도
@@ -928,55 +979,83 @@ async def scrape_prices() -> dict:
 def compute_target_cost(m: dict) -> dict | None:
     """목표 원가 상한 ($/kg-WO3) = 판매가 − 원료 매입가 − 판매가×마진
 
-    원료 매입가 = 원료 단가($/kg) × WO3 1kg당 필요 원료(kg)
-    필요 원료   = 0.7930 ÷ (원료 W함량 × 회수율)
+    시장별로 따로 계산한다 — 그 시장에서 원료를 사서 그 시장에 판다.
+      중국 내수 : 원료 = SMM 중국 시세        / 판매 = SMM 중국 WO3
+      서방      : 원료 = 유럽 스크랩 시세,
+                         정광은 로테르담 APT × 지불률(75~85%, 중간값 80%)
+                  판매 = 로테르담 APT를 함유 W 기준으로 바꾼 뒤
+                         중국 시장의 WO3/APT 프리미엄을 적용 (서방 WO3 고시가 없음)
 
-    판매가 3개 시나리오
-      하방 : 중국 내수 WO3 (SMM)
-      상방 : 서방 환산 WO3 = 로테르담 APT를 함유W 기준으로 바꾼 뒤
-             중국 시장의 WO3/APT 프리미엄을 그대로 적용
-      기준 : 두 값의 평균 (수출통제 지속 여부 불확실성 반영)
+    원료 매입가 (제품 WO3 1kg당)
+      kg 단가 원료   : 단가 × 0.7930 ÷ (W함량 × 회수율)
+      WO3 함유 기준  : 함유 WO3 1kg 가격 ÷ 회수율
+                       (슬러지 = 1%당 단가 × 100, 서방 정광 = APT $/mtu ÷ 10 × 지불률)
     """
     v = lambda k: (m.get(k) or {}).get("usd_excl")
     wo3_t, apt_cn_t, rott_mtu = v("wo3"), v("apt_cn"), v("apt_rott")
     if not wo3_t:
         return None
 
-    cn = wo3_t / 1000.0
-    scen = [("하방", "중국 내수", cn)]
-    prem = None
+    rec, mg = TARGET_COST["recovery"], TARGET_COST["margin"]
+    payable = TARGET_COST["west_conc_payable"]
+
+    cn_sale = wo3_t / 1000.0
+    west_sale, prem = None, None
     if rott_mtu:
         apt_w = 0.885 * W_IN_WO3
         rott_per_kgw = rott_mtu * MTU_PER_T / 1000.0 / apt_w
-        prem = ((cn / W_IN_WO3) / (apt_cn_t / 1000.0 / apt_w)) if apt_cn_t else 1.0
-        west = rott_per_kgw * prem * W_IN_WO3
-        scen += [("기준", "두 시장 평균", (cn + west) / 2), ("상방", "서방 환산", west)]
+        prem = ((cn_sale / W_IN_WO3) / (apt_cn_t / 1000.0 / apt_w)) if apt_cn_t else 1.0
+        west_sale = rott_per_kgw * prem * W_IN_WO3
 
-    rec, mg = TARGET_COST["recovery"], TARGET_COST["margin"]
-    rows = []
-    for key, cont, label, note in TARGET_COST["feeds"]:
-        r = m.get(key)
-        if not r:
-            rows.append({"key": key, "label": label, "note": note, "ok": False})
-            continue
-        px = r["usd_excl"]
-        if r.get("per_wo3"):
-            # WO3 1%당 단가로 고시되는 원료 — 함유 WO3 1kg 값 = 단가 × 100.
-            # 원료 함량과 무관하게 '제품 WO3 1kg' 원료비 = 단가×100 ÷ 회수율.
-            px_kg = px * 100            # 함유 WO3 1kg당
-            need = 1.0 / rec            # 함유 WO3 kg / 제품 WO3 kg
-            cont = None
-            note = "SMM이 WO3 1%당 단가로 고시 — 함량 가정 불필요"
+    markets = [
+        {"id": "cn",   "label": "중국 내수", "sale": cn_sale,
+         "sale_note": "SMM 중국 WO3"},
+        {"id": "west", "label": "서방",      "sale": west_sale,
+         "sale_note": "로테르담 APT 환산" + (f" × 프리미엄 {prem:.3f}" if prem else "")},
+    ]
+
+    def cell(key, w, sale):
+        """원료 1종 × 시장 1곳."""
+        if sale is None:
+            return {"ok": False, "why": "판매가 없음"}
+        if key is None:
+            return {"ok": False, "why": "서방 고시 시세 없음"}
+        if key == "conc_west":
+            if not rott_mtu:
+                return {"ok": False, "why": "로테르담 APT 수집실패"}
+            px = rott_mtu / 10.0 * payable              # 함유 WO3 1kg 가격
+            feed = px / rec
+            src = f"로테르담 APT ${rott_mtu:,.0f}/mtu × {payable*100:.0f}%"
+            desc = f"WO3 {1/rec:.2f}kg × ${px:,.2f}"
         else:
-            px_kg = px / 1000.0 if r["unit"] in ("USD/t", "USD/std t") else px
-            need = W_IN_WO3 / (cont * rec)
-        feed_cost = need * px_kg
+            r = m.get(key)
+            if not r:
+                return {"ok": False, "why": "원료 시세 수집실패"}
+            if r.get("per_wo3"):
+                px = r["usd_excl"] * 100               # 함유 WO3 1kg 가격
+                feed = px / rec
+                desc = f"WO3 {1/rec:.2f}kg × ${px:,.2f}"
+            else:
+                px = r["usd_excl"] / 1000.0 if r["unit"] in ("USD/t", "USD/std t") else r["usd_excl"]
+                need = W_IN_WO3 / (w * rec)
+                feed = need * px
+                desc = f"{need:.2f}kg × ${px:,.2f}"
+            src = "SMM " + r["name"]
+            if r.get("eur_orig"):
+                src += f" (€{r['eur_orig']:,.2f}/kg)"
+        cap = sale - feed - sale * mg
+        return {"ok": True, "feed_cost": feed, "desc": desc, "src": src, "cap": cap}
+
+    rows = []
+    for label, cn_key, west_key, w, note in TARGET_COST["feeds"]:
         rows.append({
-            "key": key, "label": label, "note": note, "ok": True, "per_wo3": bool(r.get("per_wo3")),
-            "content": cont, "price": px_kg, "need": need, "feed_cost": feed_cost,
-            "caps": [p - feed_cost - p * mg for _, _, p in scen],
+            "label": label, "note": note, "w": w,
+            "slug": {"scrap_sludge": "sludge", "scrap_cnc": "insert", "conc65": "conc"}[cn_key],
+            "cells": {"cn":   cell(cn_key,   w, cn_sale),
+                      "west": cell(west_key, w, west_sale)},
         })
-    return {"scen": scen, "rows": rows, "prem": prem, "margin": mg, "recovery": rec}
+    return {"markets": markets, "rows": rows, "prem": prem,
+            "margin": mg, "recovery": rec, "payable": payable}
 
 
 def compute_spreads(price_data: dict) -> dict:
@@ -1037,17 +1116,18 @@ def format_price_for_prompt(price_data: dict, usd_cny: float, spreads: dict) -> 
 
     tc = spreads.get("목표원가")
     if tc:
-        L.append(f"\n[목표 원가 상한 $/kg-WO3]  회수율 {tc['recovery']*100:.0f}% · "
-                 f"마진 {tc['margin']*100:.0f}% (잠정)")
-        L.append("  판매가: " + " / ".join(f"{a}({b}) ${p:,.2f}" for a, b, p in tc["scen"]))
-        for r in tc["rows"]:
-            if not r["ok"]:
-                L.append(f"  {r['label']}: 원료 시세 수집실패")
-                continue
-            caps = " / ".join(f"{a} {_usd(c)}" for (a, _, _), c in zip(tc["scen"], r["caps"]))
-            basis = ("WO3 1%당 단가 기준" if r.get("per_wo3")
-                     else f"W {r['content']*100:.1f}% 가정")
-            L.append(f"  {r['label']} ({basis}, 원료비 ${r['feed_cost']:,.2f}): {caps}")
+        L.append(f"\n[목표 원가 상한 $/kg-WO3]  시장별(그 시장 원료 → 그 시장 판매) · "
+                 f"회수율 {tc['recovery']*100:.0f}% · 마진 {tc['margin']*100:.0f}% (잠정)")
+        for mk in tc["markets"]:
+            sale = f"${mk['sale']:,.2f}" if mk["sale"] else "없음"
+            L.append(f"  [{mk['label']}] 판매가 {sale} ({mk['sale_note']})")
+            for r in tc["rows"]:
+                c = r["cells"][mk["id"]]
+                if not c["ok"]:
+                    L.append(f"    {r['label']}: {c['why']}")
+                else:
+                    L.append(f"    {r['label']}: 원가상한 {_usd(c['cap'])} "
+                             f"(원료비 ${c['feed_cost']:,.2f}, {c['src']})")
 
     ex = price_data.get("extras") or {}
     if ex:
@@ -1093,13 +1173,14 @@ def append_price_history(price_data: dict, usd_cny: float, spreads: dict) -> lis
         "cn_west_x":    round(spreads["중서괴리"]["x"], 3) if "중서괴리" in spreads else None,
         "regen_ratio":  round(spreads["재생가격비"]["pct"], 2) if "재생가격비" in spreads else None,
     }
-    # 목표 원가 상한 — 원료별 × 시나리오별 (tc_<원료>_<하방|기준|상방>)
+    row["scrap_ins_eu"] = g("scrap_ins_eu")
+    # 목표 원가 상한 — 원료별 × 시장별 (tc_<sludge|insert|conc>_<cn|west>)
     tc = spreads.get("목표원가")
     if tc:
         for r in tc["rows"]:
-            if r["ok"]:
-                for (lvl, _, _), c in zip(tc["scen"], r["caps"]):
-                    row[f"tc_{r['key']}_{lvl}"] = round(c, 2)
+            for mid, c in r["cells"].items():
+                if c["ok"]:
+                    row[f"tc_{r['slug']}_{mid}"] = round(c["cap"], 2)
     hist = [h for h in hist if h.get("date") != row["date"]]
     hist.append(row)
     hist.sort(key=lambda x: x["date"])
@@ -1506,8 +1587,9 @@ def analyze(articles, price_data=None, usd_cny=7.15):
    WO3 사업성 관점 시사점. 반드시 구체적 수치 인용.
    · 목표 원가 상한은 잠정 전제(회수율·마진·원료 W함량)에 기반한 값임을
      전제로 말할 것. 수준보다 전일·추세 대비 변화에 집중할 것.
-   · 중국-서방 배수가 좁혀지면 기준·상방 시나리오가 함께 내려앉는다는
-     점을 염두에 둘 것.
+   · 원가 상한은 시장별(중국 원료→중국 판매 / 서방 원료→서방 판매)이다.
+     중국 원료를 사서 서방에 파는 조합은 수출통제로 성립하지 않으니
+     그런 해석을 하지 말 것.
 ② 기사 기반 (3~4개, 필수): 오늘 뉴스에서 직접 도출. 정책·규제 /
    경쟁사 / 원료 확보 / 공급망 중 실제 움직임이 있었던 것만.
 ③ 신규 진입 관점 (1개, 가능할 때): 텅스텐 리사이클링 신규 진입자
@@ -1630,14 +1712,14 @@ def _spread_badges(spreads: dict) -> str:
     if x:
         out += badge(f"중국-서방 {x['x']:.2f}배", "#b91c1c")
     tc = spreads.get("목표원가")
-    if tc and len(tc["scen"]) >= 2:
-        base_i = 1                              # 기준 시나리오
-        best = [r for r in tc["rows"] if r["ok"]]
-        if best:
-            top = max(best, key=lambda r: r["caps"][base_i])
-            c = top["caps"][base_i]
-            out += badge(f"원가상한(기준·{top['label']}) {_usd(c)}/kg",
-                         "#047857" if c > 0 else "#b91c1c")
+    if tc:
+        for mk in tc["markets"]:
+            ok = [(r, r["cells"][mk["id"]]) for r in tc["rows"] if r["cells"][mk["id"]]["ok"]]
+            if not ok:
+                continue
+            r, c = max(ok, key=lambda x: x[1]["cap"])
+            out += badge(f"원가상한 {mk['label']}·{r['label']} {_usd(c['cap'])}/kg-WO3",
+                         "#047857" if c["cap"] > 0 else "#b91c1c")
     r = spreads.get("재생가격비")
     if r:
         out += badge(f"재생품 가격비 {r['pct']:.1f}%", "#475569")
@@ -1663,8 +1745,9 @@ def _price_rows(price_data: dict) -> str:
 
         if ok:
             nd    = 2 if (r["unit"].startswith("USD/kg") or r["unit"] == "USD/mtu") else 0
+            unit_txt = r["unit"] + (f' · €{r["eur_orig"]:,.2f}' if r.get("eur_orig") else "")
             price = (f'<b style="font-size:13px;">{_fmt(r["usd_excl"], "$", nd)}</b>'
-                     f'<br><span style="color:#94a3b8;font-size:10px;">{esc(r["unit"])}</span>')
+                     f'<br><span style="color:#94a3b8;font-size:10px;">{esc(unit_txt)}</span>')
             if r.get("usd_kg_w"):
                 conv = (f'<b style="font-size:12px;">${r["usd_kg_w"]:,.2f}</b>'
                         f'<br><span style="color:#94a3b8;font-size:10px;">/kg-W</span>')
@@ -1700,54 +1783,55 @@ def _spread_table(spreads: dict) -> str:
     out = ""
 
     if tc:
+        mks = tc["markets"]
+        HD = f"{TDR}font-weight:700;color:#475569;background:#f8fafc;border-bottom:2px solid #e2e8f0;"
         heads = "".join(
-            f'<td style="{TDR}font-weight:700;color:#475569;background:#f8fafc;'
-            f'border-bottom:2px solid #e2e8f0;">{esc(a)}<br>'
-            f'<span style="font-weight:400;font-size:10px;color:#94a3b8;">{esc(b)} '
-            f'${p:,.2f}</span></td>'
-            for a, b, p in tc["scen"])
+            f'<td style="{HD}">{esc(mk["label"])}<br>'
+            f'<span style="font-weight:400;font-size:10px;color:#94a3b8;">판매 '
+            f'{("$" + format(mk["sale"], ",.2f")) if mk["sale"] else "—"}</span></td>'
+            for mk in mks)
         body = ""
         for r in tc["rows"]:
-            if not r["ok"]:
-                body += (f'<tr><td style="{TD}"><b>{esc(r["label"])}</b></td>'
-                         f'<td colspan="{len(tc["scen"])+1}" style="{TDR}color:#b91c1c;">'
-                         f'원료 시세 수집실패</td></tr>')
-                continue
-            cells = "".join(
-                f'<td style="{TDR}font-size:14px;font-weight:700;'
-                f'color:{"#047857" if c > 0 else "#b91c1c"};">{_usd(c)}</td>'
-                for c in r["caps"])
+            cells = ""
+            for mk in mks:
+                c = r["cells"][mk["id"]]
+                if not c["ok"]:
+                    cells += (f'<td style="{TDR}color:#94a3b8;font-size:11px;">'
+                              f'{esc(c["why"])}</td>')
+                    continue
+                clr = "#047857" if c["cap"] > 0 else "#b91c1c"
+                cells += (f'<td style="{TDR}"><b style="font-size:14px;color:{clr};">'
+                          f'{_usd(c["cap"])}</b><br>'
+                          f'<span style="color:#64748b;font-size:10px;">원료비 ${c["feed_cost"]:,.2f}'
+                          f' = {esc(c["desc"])}</span><br>'
+                          f'<span style="color:#94a3b8;font-size:10px;">{esc(c["src"])}</span></td>')
             body += f"""
         <tr>
           <td style="{TD}"><b>{esc(r['label'])}</b><br>
             <span style="color:#94a3b8;font-size:10px;">{esc(r['note'])}</span></td>
-          <td style="{TDR}">${r['feed_cost']:,.2f}<br>
-            <span style="color:#94a3b8;font-size:10px;">{
-              (f"WO3 {r['need']:.2f}kg × ${r['price']:,.2f}") if r.get('per_wo3')
-              else (f"{r['need']:.2f}kg × ${r['price']:,.2f}")}</span></td>
           {cells}
         </tr>"""
-        prem = f" · 서방 환산 시 WO3/APT 프리미엄 {tc['prem']:.3f} 적용" if tc.get("prem") else ""
+        prem = f" · 서방 판매가 = 로테르담 APT 함유W × WO3/APT 프리미엄 {tc['prem']:.3f}" if tc.get("prem") else ""
         out += f"""
     <table width="100%" cellpadding="0" cellspacing="0" border="0"
            style="background:#fff;border:1px solid #e2e8f0;border-collapse:collapse;margin-top:14px;">
       <thead>
-        <tr><td colspan="{len(tc['scen'])+2}" style="padding:10px 12px;background:#1c1917;color:#fff;
+        <tr><td colspan="{len(mks)+1}" style="padding:10px 12px;background:#1c1917;color:#fff;
             font-size:12px;font-weight:700;">목표 원가 상한 · $/kg-WO3 · = CAPEX+OPEX 허용 한도</td></tr>
         <tr>
           <td style="{TD}font-weight:700;color:#475569;background:#f8fafc;border-bottom:2px solid #e2e8f0;">원료</td>
-          <td style="{TDR}font-weight:700;color:#475569;background:#f8fafc;border-bottom:2px solid #e2e8f0;">원료 매입가</td>
           {heads}
         </tr>
       </thead>
       <tbody>{body}</tbody>
     </table>
     <p style="margin:6px 2px 0;font-size:10px;color:#94a3b8;line-height:1.6;">
-      목표 원가 상한 = 판매가 − 원료 매입가 − 판매가×마진 ·
-      원료 매입가 = 원료 단가 × 0.7930 ÷ (W함량 × 회수율) · WO3 %단가 원료는 단가×100 ÷ 회수율<br>
-      <b>잠정 전제</b> — 회수율 {tc['recovery']*100:.0f}%(문헌 기준) ·
-      마진 {tc['margin']*100:.0f}%(재무팀 확인 전) · 원료 W함량은 원료별 가정치{prem} ·
-      기준 시나리오 = 중국 내수와 서방 환산의 평균(수출통제 지속 불확실성 반영)</p>"""
+      목표 원가 상한 = 판매가 − 원료 매입가 − 판매가×마진 · 시장별 계산(그 시장 원료를 사서 그 시장에 판매.
+      중국 원료→서방 판매는 수출통제로 제외)<br>
+      원료 매입가 = 원료 단가 × 0.7930 ÷ (W함량 × 회수율) · 함유 WO3 기준 원료는 WO3 1kg 가격 ÷ 회수율<br>
+      <b>잠정 전제</b> — 회수율 {tc['recovery']*100:.0f}%(문헌: 화학공정 약 97%) ·
+      마진 {tc['margin']*100:.0f}%(재무팀 확인 전) · 인서트 W 80%(문헌 '80% 이상', 실거래는 분석치 정산) ·
+      서방 정광 지불률 {tc['payable']*100:.0f}%(서방 장기계약 75~85%){prem}</p>"""
 
     rows = ""
     x = spreads.get("중서괴리")
@@ -1847,9 +1931,11 @@ _CHART_JS = """
   };
   const usd = v => '$' + v.toFixed(0);
   draw('ch_tc', [
-    ds('연삭 슬러지',     D.tc_sludge, '#047857', false),
-    ds('폐 CNC 인서트',   D.tc_cnc,    '#f59e0b', false),
-    ds('흑중석 정광 65%', D.tc_conc,   '#7c3aed', true)
+    ds('중국·슬러지', D.tc_sludge_cn,  '#047857', false),
+    ds('중국·인서트', D.tc_insert_cn,  '#f59e0b', false),
+    ds('중국·정광',   D.tc_conc_cn,    '#7c3aed', false),
+    ds('서방·인서트', D.tc_insert_west,'#f59e0b', true),
+    ds('서방·정광',   D.tc_conc_west,  '#7c3aed', true)
   ], usd);
   draw('ch_cw', [
     ds('중국-서방 배수', D.cn_west_x, '#b91c1c', false)
@@ -1868,14 +1954,14 @@ function dlCsv() {
              '연삭슬러지_USDkg','폐CNC_USDkg','폐볼치_USDkg','정광65_USDt',
              '신품WC_USDkg','재생WC_USDkg','황산코발트_USDt',
              '중국서방_배수','재생품가격비_%',
-             '원가상한_슬러지_하방','원가상한_슬러지_기준','원가상한_슬러지_상방',
-             '원가상한_인서트_하방','원가상한_인서트_기준','원가상한_인서트_상방',
-             '원가상한_정광_하방','원가상한_정광_기준','원가상한_정광_상방','USD/CNY'];
+             '유럽인서트_USDkg',
+             '원가상한_중국_슬러지','원가상한_중국_인서트','원가상한_중국_정광',
+             '원가상한_서방_인서트','원가상한_서방_정광','USD/CNY'];
   const K = ['date','wo3','apt_cn','apt_rott','scrap_sludge','scrap_cnc','scrap_ball','conc65',
              'wc_new','wc_regen','co_sulph','cn_west_x','regen_ratio',
-             'tc_scrap_sludge_하방','tc_scrap_sludge_기준','tc_scrap_sludge_상방',
-             'tc_scrap_cnc_하방','tc_scrap_cnc_기준','tc_scrap_cnc_상방',
-             'tc_conc65_하방','tc_conc65_기준','tc_conc65_상방','usd_cny'];
+             'scrap_ins_eu',
+             'tc_sludge_cn','tc_insert_cn','tc_conc_cn',
+             'tc_insert_west','tc_conc_west','usd_cny'];
   fetch('__DATA__').then(r => r.json()).then(rows => {
     const csv = '\\uFEFF' + [H.join(',')]
       .concat(rows.map(r => K.map(k => (r[k] == null ? '' : r[k])).join(','))).join('\\n');
@@ -1927,9 +2013,8 @@ def build_price_web(price_data, usd_cny, hist, data_path="data/prices.json") -> 
     CD = {"labels": [h["date"][5:] for h in recent]}
     for k in ("wo3", "apt_cn", "conc65", "cn_west_x"):
         CD[k] = [h.get(k) for h in recent]
-    for alias, key in (("tc_sludge", "scrap_sludge"), ("tc_cnc", "scrap_cnc"),
-                       ("tc_conc", "conc65")):
-        CD[alias] = [h.get(f"tc_{key}_기준") for h in recent]
+    for k in ("tc_sludge_cn", "tc_insert_cn", "tc_conc_cn", "tc_insert_west", "tc_conc_west"):
+        CD[k] = [h.get(k) for h in recent]
 
     def canvas(cid, title, sub):
         return f"""
@@ -1946,7 +2031,7 @@ def build_price_web(price_data, usd_cny, hist, data_path="data/prices.json") -> 
     charts = f"""
       <div style="font-size:13px;font-weight:700;margin:24px 0 4px;">추이</div>
       <div style="font-size:11px;color:#94a3b8;margin-bottom:12px;">{note}</div>
-      {canvas("ch_tc",  "목표 원가 상한 · 기준 시나리오", "$/kg-WO3 · 원료별 · 잠정 전제")}
+      {canvas("ch_tc",  "목표 원가 상한 · 시장별", "$/kg-WO3 · 실선 중국 내수 · 점선 서방 · 잠정 전제")}
       {canvas("ch_cw",  "중국-서방 배수",                 "CIF 로테르담 APT ÷ 중국 내수 APT")}
       {canvas("ch_wo3", "WO3 · APT · 정광",               "USD/t · 중국 내수")}
       <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -2406,14 +2491,16 @@ async def main():
             print(f"  [지표] 재생품 가격비 {sp['재생가격비']['pct']:.1f}%")
         tc = sp.get("목표원가")
         if tc:
-            print("  [목표 원가 상한 $/kg-WO3] "
-                  + " / ".join(f"{a} 판매 ${p:,.2f}" for a, _, p in tc["scen"]))
-            for r in tc["rows"]:
-                if r["ok"]:
-                    print(f"    {r['label']:12s} 원료비 ${r['feed_cost']:8.2f} → "
-                          + " / ".join(f"{a} {_usd(c)}" for (a, _, _), c in zip(tc["scen"], r["caps"])))
-                else:
-                    print(f"    {r['label']:12s} 원료 시세 없음")
+            print("  [목표 원가 상한 $/kg-WO3]")
+            for mk in tc["markets"]:
+                sale = f"${mk['sale']:,.2f}" if mk["sale"] else "없음"
+                print(f"   {mk['label']} — 판매 {sale}")
+                for r in tc["rows"]:
+                    c = r["cells"][mk["id"]]
+                    if c["ok"]:
+                        print(f"    {r['label']:10s} 원료비 ${c['feed_cost']:8.2f} → {_usd(c['cap'])}  ({c['src']})")
+                    else:
+                        print(f"    {r['label']:10s} {c['why']}")
 
     seen     = load_seen()
     articles = collect_rss(seen)
