@@ -598,5 +598,27 @@
   "tc_insert_west": 196.94,
   "tc_conc_cn": 4.46,
   "tc_conc_west": 45.78
+ },
+ {
+  "date": "2026-10-28",
+  "usd_cny": 6.6675,
+  "wo3": 80776.76,
+  "apt_cn": 68196.77,
+  "apt_rott": 2800.0,
+  "scrap_sludge": 0.65,
+  "scrap_cnc": 70.33,
+  "scrap_ball": 74.82,
+  "conc65": 44890.69,
+  "wc_new": 99.32,
+  "wc_regen": 90.05,
+  "co_sulph": 6091.36,
+  "cn_west_x": 3.634,
+  "regen_ratio": 90.67,
+  "scrap_ins_eu": 80.8375,
+  "tc_sludge_cn": 8.32,
+  "tc_insert_cn": 3.36,
+  "tc_insert_west": 194.49,
+  "tc_conc_cn": 4.04,
+  "tc_conc_west": 43.05
  }
 ]
